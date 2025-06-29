@@ -41,39 +41,27 @@ const ChangePassword = () => {
   const handleChangePassword = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (!user?.pin) {
-      toast.error("User PIN not found.");
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      toast.error("New passwords do not match.");
-      return;
-    }
+    if (!user?.pin) return toast.error("User PIN not found.");
+    if (newPassword !== confirmPassword)
+      return toast.error("New passwords do not match.");
 
     const isValid = Object.values(passwordValidation).every(Boolean);
-
-    if (!isValid) {
-      toast.error("Password does not meet security criteria.");
-      return;
-    }
+    if (!isValid)
+      return toast.error("Password does not meet security criteria.");
 
     setIsSubmitting(true);
 
     try {
       const result = await changePassword(user.pin, { password: newPassword });
       if (result?.isSuccessful) {
-        setTimeout(() => {
-          setIsSubmitting(false);
-          toast.success(result.message);
-          router.push("/home");
-        }, 2000);
+        toast.success(result.message);
+        router.push("/home");
       } else {
         toast.error(result?.message);
-        setIsSubmitting(false);
       }
     } catch {
       toast.error("Unexpected error occurred.");
+    } finally {
       setIsSubmitting(false);
     }
   };

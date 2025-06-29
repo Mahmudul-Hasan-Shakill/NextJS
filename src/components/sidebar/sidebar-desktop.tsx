@@ -42,7 +42,8 @@ export function SidebarDesktop({ sidebarItems }: SidebarDesktopProps) {
   );
 
   return (
-    <aside className="w-[250px] max-w-xs h-screen fixed left-0 top-0 z-40 border-r bg-gray-300 dark:bg-gray-900">
+    // <aside className="w-[250px] max-w-xs h-screen fixed left-0 top-0 z-40 border-r bg-gray-300 dark:bg-gray-900">
+    <aside className="w-[250px] h-full bg-gray-300 dark:bg-gray-900">
       <div className="h-full flex flex-col px-2 py-4 ">
         {/* Header */}
         <div className="flex items-center justify-start mb-8">

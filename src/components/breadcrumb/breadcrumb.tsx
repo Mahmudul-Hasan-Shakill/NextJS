@@ -40,8 +40,11 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ pageName }) => {
   }, [pathname, pageName]);
 
   return (
-    <nav aria-label="breadcrumbs" className="m-4">
-      <ol className="flex space-x-2 text-xs text-black dark:text-white font-bold bg-gray-300 dark:bg-gray-800 px-4 py-2 rounded">
+    <nav
+      aria-label="breadcrumbs"
+      className="pt-4 p-8 sm:pl-6 sm:pr-6 md:px-20 lg:px-16 lg:py-5"
+    >
+      <ol className="flex flex-wrap items-center space-x-2 text-xs text-black dark:text-white font-bold bg-gray-300 dark:bg-gray-800 px-4 py-2 rounded">
         {breadcrumbs.map((breadcrumb, index) => (
           <li key={index} className="inline">
             {index < breadcrumbs.length - 1 ? (
@@ -51,7 +54,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ pageName }) => {
             ) : (
               <span>{breadcrumb.label}</span>
             )}
-            {index < breadcrumbs.length - 1 && <span className="mx-2">/</span>}{" "}
+            {index < breadcrumbs.length - 1 && <span className="mx-2">/</span>}
           </li>
         ))}
       </ol>
