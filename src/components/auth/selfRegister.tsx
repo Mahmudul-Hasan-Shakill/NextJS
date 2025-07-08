@@ -7,9 +7,11 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useSelfRegister } from "@/hooks/useSelfRegister";
 import DataLoader from "../loader/dataLoader";
-import { SelfRegisterData } from "@/types/user";
+import { SelfRegisterData } from "@/types/register";
 import { toast } from "sonner";
 import { IoIosEye, IoIosEyeOff } from "react-icons/io";
+import { divisionsData } from "@/types/data";
+import { Select } from "../ui/selects";
 
 export function SelfRegister() {
   const { register, loading } = useSelfRegister();
@@ -27,34 +29,20 @@ export function SelfRegister() {
     userRole: "",
   });
   const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev); // Toggle the password visibility
+    setShowPassword((prev) => !prev);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { id, value } = e.target;
-    setFormData({ ...formData, [id]: value });
+    setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
   const validatePassword = (password: string) => {
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,}$/;
     return passwordRegex.test(password);
-  };
-
-  const handlePasswordBlur = () => {
-    if (!validatePassword(formData.password)) {
-      toast.warning(
-        <>
-          Password must contain at least 6 characters,
-          <br />
-          Including upper and lower case letters,
-          <br />
-          At least one number and
-          <br />
-          At least one special character.
-        </>
-      );
-    }
   };
 
   const handlePinChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -67,6 +55,23 @@ export function SelfRegister() {
     }
   };
 
+  const [selectedDivisionId, setSelectedDivisionId] = useState<number | null>(
+    null
+  );
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState<
+    number | null
+  >(null);
+
+  const filteredDepartments = selectedDivisionId
+    ? divisionsData.find((div) => div.id === selectedDivisionId)?.departments ||
+      []
+    : [];
+
+  const filteredUnits = selectedDepartmentId
+    ? filteredDepartments.find((dep) => dep.id === selectedDepartmentId)
+        ?.units || []
+    : [];
+
   useEffect(() => {
     setFormData((prev) => ({
       ...prev,
@@ -75,22 +80,54 @@ export function SelfRegister() {
     }));
   }, [formData.name]);
 
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await register(formData);
 
-    setFormData({
-      pin: "",
-      name: "",
-      email: "",
-      unit: "",
-      division: "",
-      department: "",
-      password: "",
-      makeBy: "",
-      userRole: "",
-    });
-    setPin("");
+    // Validate password
+    if (!validatePassword(formData.password)) {
+      toast.warning(
+        <>
+          Password must contain at least 6 characters,
+          <br />
+          Including upper and lower case letters,
+          <br />
+          At least one number and
+          <br />
+          At least one special character.
+        </>
+      );
+      return;
+    }
+
+    // Validate email
+    if (!validateEmail(formData.email)) {
+      toast.warning("Email must be a valid email address.");
+      return;
+    }
+
+    try {
+      await register(formData);
+      setFormData({
+        pin: "",
+        name: "",
+        email: "",
+        unit: "",
+        division: "",
+        department: "",
+        password: "",
+        makeBy: "",
+        userRole: "",
+      });
+      setPin("");
+    } catch (error: any) {
+      console.error("Registration failed:", error);
+      toast.error("Internal server error. Please try again later.");
+    }
   };
 
   if (loading) return <DataLoader />;
@@ -149,48 +186,83 @@ export function SelfRegister() {
             />
           </LabelInputContainer>
           <LabelInputContainer>
-            <Label className="text-xs" htmlFor="unit">
-              Unit <span className="text-red-500">*</span>
+            <Label className="text-xs" htmlFor="division">
+              Division <span className="text-red-500">*</span>
             </Label>
-            <Input
-              className="text-xs"
-              id="unit"
-              placeholder="Unit"
-              type="text"
-              value={formData.unit}
-              onChange={handleChange}
-              required
+            <Select
+              name="division"
+              value={formData.division}
+              onChange={(e) => {
+                const divisionId = parseInt(e.target.value);
+                const selectedDivision = divisionsData.find(
+                  (div) => div.id === divisionId
+                );
+                if (selectedDivision) {
+                  setSelectedDivisionId(divisionId);
+                  setSelectedDepartmentId(null);
+                  setFormData((prev) => ({
+                    ...prev,
+                    division: divisionId.toString(), // store ID
+                    department: "",
+                    unit: "",
+                  }));
+                }
+              }}
+              options={divisionsData.map((div) => ({
+                value: div.id.toString(),
+                label: div.name,
+              }))}
+              placeholder="-- Select Division --"
+              className="text-[10px]"
             />
           </LabelInputContainer>
         </div>
 
         <div className="mb-4 flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
           <LabelInputContainer>
-            <Label className="text-xs" htmlFor="division">
-              Division <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              className="text-xs"
-              id="division"
-              placeholder="Division"
-              type="text"
-              value={formData.division}
-              onChange={handleChange}
-              required
-            />
-          </LabelInputContainer>
-          <LabelInputContainer>
             <Label className="text-xs" htmlFor="department">
               Department <span className="text-red-500">*</span>
             </Label>
-            <Input
-              className="text-xs"
-              id="department"
-              placeholder="Department"
-              type="text"
+            <Select
+              name="department"
               value={formData.department}
+              onChange={(e) => {
+                const departmentId = parseInt(e.target.value);
+                const selectedDepartment = filteredDepartments.find(
+                  (dep) => dep.id === departmentId
+                );
+                if (selectedDepartment) {
+                  setSelectedDepartmentId(departmentId);
+                  setFormData((prev) => ({
+                    ...prev,
+                    department: departmentId.toString(), // store ID
+                    unit: "",
+                  }));
+                }
+              }}
+              options={filteredDepartments.map((dep) => ({
+                value: dep.id.toString(),
+                label: dep.name,
+              }))}
+              placeholder="-- Select Department --"
+              className="text-[10px]"
+            />
+          </LabelInputContainer>
+
+          <LabelInputContainer>
+            <Label className="text-xs" htmlFor="unit">
+              Unit <span className="text-red-500">*</span>
+            </Label>
+            <Select
+              name="unit"
+              value={formData.unit}
               onChange={handleChange}
-              required
+              options={filteredUnits.map((unit) => ({
+                value: unit.name,
+                label: unit.name,
+              }))}
+              placeholder="-- Select Unit --"
+              className="text-[10px]"
             />
           </LabelInputContainer>
         </div>
@@ -208,7 +280,6 @@ export function SelfRegister() {
                 type={showPassword ? "text" : "password"}
                 value={formData.password}
                 onChange={handleChange}
-                onBlur={handlePasswordBlur}
                 className="text-xs"
                 required
               />

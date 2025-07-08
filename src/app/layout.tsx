@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
 import AuthProvider from "@/components/auth-provider";
+import CommonLoader from "@/components/loader/commonLoader";
 
 export const metadata: Metadata = {
   title: {
@@ -41,17 +42,19 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={Inter.className}>
       <head />
-      <body suppressHydrationWarning={true}>
+      <body suppressHydrationWarning={true} className="overflow-x-hidden">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          <AuthProvider>
-            {children}
-            <Toaster position="top-right" richColors />
-          </AuthProvider>
+          <CommonLoader>
+            <AuthProvider>
+              {children}
+              <Toaster position="top-right" richColors />
+            </AuthProvider>
+          </CommonLoader>
         </ThemeProvider>
       </body>
     </html>

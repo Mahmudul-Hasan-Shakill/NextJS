@@ -7,17 +7,36 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useRegister } from "@/hooks/useRegister";
 import DataLoader from "../loader/dataLoader";
-import { RegisterData } from "@/types/user";
+import { RegisterData } from "@/types/register";
 import { toast } from "sonner";
 import { useUserDetails } from "@/hooks/useUserDetails";
 import { useRoleNames } from "@/hooks/useRoleNames";
 import { Select } from "../ui/selects";
+import MailLoader from "../loader/mailLoader";
+import { divisionsData } from "@/types/data";
 
 export function UserRegister() {
   const { register, loading } = useRegister();
   const [pin, setPin] = useState("");
   const userName = useUserDetails();
   const { roleNames } = useRoleNames();
+  const [showAnimation, setShowAnimation] = useState(false);
+  const [selectedDivisionId, setSelectedDivisionId] = useState<number | null>(
+    null
+  );
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState<
+    number | null
+  >(null);
+
+  const filteredDepartments = selectedDivisionId
+    ? divisionsData.find((div) => div.id === selectedDivisionId)?.departments ||
+      []
+    : [];
+
+  const filteredUnits = selectedDepartmentId
+    ? filteredDepartments.find((dep) => dep.id === selectedDepartmentId)
+        ?.units || []
+    : [];
 
   const [formData, setFormData] = useState<RegisterData>({
     pin: "",
@@ -41,7 +60,7 @@ export function UserRegister() {
     const newPin = e.target.value;
     if (/^\d{0,5}$/.test(newPin)) {
       setPin(newPin);
-      setFormData((prev) => ({ ...prev, pin: newPin })); // Update formData with the new PIN
+      setFormData((prev) => ({ ...prev, pin: newPin }));
     } else {
       toast.error("PIN must be numeric and up to 5 digits only.");
     }
@@ -50,33 +69,50 @@ export function UserRegister() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    setShowAnimation(true);
+
     const payload = {
       ...formData,
       makeBy: userName,
     };
 
-    await register(payload);
+    setTimeout(async () => {
+      try {
+        const success = await register(payload);
+        if (success) {
+        } else {
+        }
 
-    setFormData({
-      pin: "",
-      name: "",
-      email: "",
-      unit: "",
-      division: "",
-      department: "",
-      makeBy: "",
-      userRole: "",
-    });
-    setPin("");
+        setFormData({
+          pin: "",
+          name: "",
+          email: "",
+          unit: "",
+          division: "",
+          department: "",
+          makeBy: "",
+          userRole: "",
+        });
+        setPin("");
+      } catch (error) {
+        toast.error("Registration failed.");
+        console.error(error);
+      } finally {
+        setShowAnimation(false);
+      }
+    }, 5000);
   };
 
   if (loading) return <DataLoader />;
 
   return (
-    <div className="shadow-none mx-auto w-full max-w-md rounded-none bg-white p-4 md:rounded-2xl md:p-8 dark:bg-black">
-      <h2 className="text-xl text-center font-bold text-black dark:text-white">
+    <div className="mx-auto w-full max-w-5xl bg-white p-6 rounded-lg shadow-md dark:bg-black">
+      <h2 className="text-xl font-bold text-center mb-6 text-black dark:text-white">
         Register User
       </h2>
+      {showAnimation && <MailLoader />}
+      <div className="my-8 h-[1px] w-full bg-gradient-to-r from-transparent via-neutral-300 to-transparent dark:via-neutral-700" />
+
       <form className="text-xs my-8" onSubmit={handleSubmit}>
         <div className="mb-4 flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
           <LabelInputContainer>
@@ -109,7 +145,7 @@ export function UserRegister() {
           </LabelInputContainer>
         </div>
 
-        <div className="mb-4 flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
+        {/* <div className="mb-4 flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
           <LabelInputContainer>
             <Label className="text-xs" htmlFor="email">
               Email <span className="text-red-500">*</span>
@@ -125,22 +161,40 @@ export function UserRegister() {
             />
           </LabelInputContainer>
           <LabelInputContainer>
-            <Label className="text-xs" htmlFor="unit">
-              Unit <span className="text-red-500">*</span>
+            <Label className="text-xs" htmlFor="division">
+              Division <span className="text-red-500">*</span>
             </Label>
-            <Input
-              className="text-xs"
-              id="unit"
-              placeholder="Unit"
-              type="text"
-              value={formData.unit}
-              onChange={handleChange}
-              required
+            <Select
+              name="division"
+              value={formData.division}
+              onChange={(e) => {
+                const divisionId = parseInt(e.target.value);
+                const selectedDivision = divisionsData.find(
+                  (div) => div.id === divisionId
+                );
+
+                if (selectedDivision) {
+                  setSelectedDivisionId(divisionId);
+                  setSelectedDepartmentId(null);
+                  setFormData((prev) => ({
+                    ...prev,
+                    division: selectedDivision.name,
+                    department: "",
+                    unit: "",
+                  }));
+                }
+              }}
+              options={divisionsData.map((div) => ({
+                value: div.id.toString(),
+                label: div.name,
+              }))}
+              placeholder="-- Select Division --"
+              className="text-[10px]"
             />
           </LabelInputContainer>
-        </div>
+        </div> */}
 
-        <div className="mb-4 flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
+        {/* <div className="mb-4 flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
           <LabelInputContainer>
             <Label className="text-xs" htmlFor="division">
               Division <span className="text-red-500">*</span>
@@ -169,6 +223,106 @@ export function UserRegister() {
               required
             />
           </LabelInputContainer>
+        </div> */}
+
+        {/* Email and Division */}
+        <div className="mb-4 flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
+          <LabelInputContainer>
+            <Label className="text-xs" htmlFor="email">
+              Email <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              className="text-xs"
+              id="email"
+              placeholder="example@domain.com"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </LabelInputContainer>
+
+          <LabelInputContainer>
+            <Label className="text-xs" htmlFor="division">
+              Division <span className="text-red-500">*</span>
+            </Label>
+            <Select
+              name="division"
+              value={formData.division}
+              onChange={(e) => {
+                const divisionId = parseInt(e.target.value);
+                const selectedDivision = divisionsData.find(
+                  (div) => div.id === divisionId
+                );
+                if (selectedDivision) {
+                  setSelectedDivisionId(divisionId);
+                  setSelectedDepartmentId(null);
+                  setFormData((prev) => ({
+                    ...prev,
+                    division: divisionId.toString(), // store ID
+                    department: "",
+                    unit: "",
+                  }));
+                }
+              }}
+              options={divisionsData.map((div) => ({
+                value: div.id.toString(),
+                label: div.name,
+              }))}
+              placeholder="-- Select Division --"
+              className="text-[10px]"
+            />
+          </LabelInputContainer>
+        </div>
+
+        {/* Department and Unit */}
+        <div className="mb-4 flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
+          <LabelInputContainer>
+            <Label className="text-xs" htmlFor="department">
+              Department <span className="text-red-500">*</span>
+            </Label>
+            <Select
+              name="department"
+              value={formData.department}
+              onChange={(e) => {
+                const departmentId = parseInt(e.target.value);
+                const selectedDepartment = filteredDepartments.find(
+                  (dep) => dep.id === departmentId
+                );
+                if (selectedDepartment) {
+                  setSelectedDepartmentId(departmentId);
+                  setFormData((prev) => ({
+                    ...prev,
+                    department: departmentId.toString(), // store ID
+                    unit: "",
+                  }));
+                }
+              }}
+              options={filteredDepartments.map((dep) => ({
+                value: dep.id.toString(),
+                label: dep.name,
+              }))}
+              placeholder="-- Select Department --"
+              className="text-[10px]"
+            />
+          </LabelInputContainer>
+
+          <LabelInputContainer>
+            <Label className="text-xs" htmlFor="unit">
+              Unit <span className="text-red-500">*</span>
+            </Label>
+            <Select
+              name="unit"
+              value={formData.unit}
+              onChange={handleChange}
+              options={filteredUnits.map((unit) => ({
+                value: unit.name,
+                label: unit.name,
+              }))}
+              placeholder="-- Select Unit --"
+              className="text-[10px]"
+            />
+          </LabelInputContainer>
         </div>
 
         <div className="mb-4">
@@ -177,19 +331,13 @@ export function UserRegister() {
               Role <span className="text-red-500">*</span>
             </Label>
             <Select
-              id="userRole"
+              name="userRole"
               value={formData.userRole}
               onChange={handleChange}
-              required
-              className="text-xs"
-            >
-              <option value="">Select Role</option>
-              {roleNames?.map((role: string) => (
-                <option key={role} value={role}>
-                  {role}
-                </option>
-              ))}
-            </Select>
+              className="text-[10px]"
+              options={roleNames.map((role) => ({ value: role, label: role }))}
+              placeholder="-- Select an option --"
+            />
           </LabelInputContainer>
         </div>
 

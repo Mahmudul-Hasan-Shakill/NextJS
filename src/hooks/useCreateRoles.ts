@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { roleService } from "@/services/roleServices";
 
@@ -7,11 +9,14 @@ export function useCreateRoles() {
   const createRoles = async (roleDtos: any[]) => {
     setLoading(true);
     try {
-      const response = await roleService.createRoles(roleDtos);
-      return response;
-    } catch (err) {
-      console.error("Error creating roles:", err);
-      throw err;
+      const res = await roleService.createRoles(roleDtos);
+      return res;
+    } catch (err: any) {
+      return {
+        isSuccessful: false,
+        message: err.message || "Unexpected error occurred.",
+        data: [],
+      };
     } finally {
       setLoading(false);
     }

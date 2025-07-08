@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { FaUserCircle } from "react-icons/fa";
-import { MoreHorizontal, Settings, RotateCcwKey } from "lucide-react";
+import { MoreHorizontal, RotateCcwKey, UserRoundPen } from "lucide-react";
 import { SidebarButton } from "./sidebar-button";
 import { SidebarItems } from "@/types/types";
 import { Separator } from "../ui/separator";
@@ -23,23 +23,14 @@ interface SidebarDesktopProps {
   sidebarItems: SidebarItems;
 }
 
-const getRolesForHref = (rolesData: any[], href: string): string[] => {
-  return rolesData
-    .filter((role) =>
-      role.hrefGui?.toLowerCase().startsWith(href.toLowerCase())
-    )
-    .map((role) => role.roleName.toLowerCase());
-};
-
 export function SidebarDesktop({ sidebarItems }: SidebarDesktopProps) {
   const userName = useUserDetails();
-  const rolesData = useRolesData();
+
+  const { getRolesForHref } = useRolesData();
+
   const pathname = usePathname();
 
-  const allowedRolesForSettings = getRolesForHref(
-    rolesData,
-    "/account-settings"
-  );
+  const allowedRolesForSettings = getRolesForHref("/user-profile");
 
   return (
     // <aside className="w-[250px] max-w-xs h-screen fixed left-0 top-0 z-40 border-r bg-gray-300 dark:bg-gray-900">
@@ -68,7 +59,7 @@ export function SidebarDesktop({ sidebarItems }: SidebarDesktopProps) {
         <div className="flex-1 mt-0 overflow-y-auto scrollbar-hide">
           <div className="flex flex-col gap-2 w-full">
             {sidebarItems.links.map((link, index) => {
-              const allowedRoles = getRolesForHref(rolesData, link.href);
+              const allowedRoles = getRolesForHref(link.href);
               return (
                 <RoleBasedAccess allowedRoles={allowedRoles} key={index}>
                   <Link href={link.href}>
@@ -111,13 +102,13 @@ export function SidebarDesktop({ sidebarItems }: SidebarDesktopProps) {
             <PopoverContent className="mb-2 w-56 p-3 rounded-[1rem] bg-gray-100 dark:bg-gray-950">
               <div className="space-y-1">
                 <RoleBasedAccess allowedRoles={allowedRolesForSettings}>
-                  <Link href="/account-settings">
+                  <Link href="/user-profile">
                     <SidebarButton
                       size="sm"
-                      icon={Settings}
+                      icon={UserRoundPen}
                       className="w-full text-xs p-2"
                     >
-                      Account Settings
+                      My Profile
                     </SidebarButton>
                   </Link>
                 </RoleBasedAccess>

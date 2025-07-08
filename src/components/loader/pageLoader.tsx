@@ -6,7 +6,7 @@ import animationData from "@/../public/lottie/loading-animation2.json";
 
 const PageLoader: React.FC = () => {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white dark:bg-black bg-opacity-50">
       <Player
         autoplay
         loop

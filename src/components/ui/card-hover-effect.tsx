@@ -18,7 +18,7 @@ export const HoverEffect = ({
   return (
     <div
       className={cn(
-        "grid grid-cols-1 md:grid-cols-2  lg:grid-cols-3  py-10",
+        "grid grid-cols-1 md:grid-cols-2  lg:grid-cols-2  py-10",
         className
       )}
     >
@@ -33,7 +33,7 @@ export const HoverEffect = ({
           <AnimatePresence>
             {hoveredIndex === idx && (
               <motion.span
-                className="absolute inset-0 h-full w-full bg-gray-300 dark:bg-gray-700 block  rounded-3xl"
+                className="absolute inset-0 h-full w-full bg-gray-400 dark:bg-gray-600 block  rounded-sm"
                 layoutId="hoverBackground"
                 initial={{ opacity: 0 }}
                 animate={{
@@ -66,7 +66,7 @@ export const Card = ({
   return (
     <div
       className={cn(
-        "rounded-2xl h-full w-full p-4 overflow-hidden bg-gray-300 border border-transparent dark:bg-gray-800 group-hover:border-slate-400 relative z-20",
+        "rounded-sm h-full w-full p-4 overflow-hidden bg-gray-200 border border-transparent dark:bg-gray-800 group-hover:border-slate-400 relative z-20",
         className
       )}
     >

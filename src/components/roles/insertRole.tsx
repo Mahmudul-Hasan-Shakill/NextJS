@@ -1,29 +1,56 @@
 "use client";
 
-import React, { useState, ChangeEvent, FormEvent } from "react";
-import LoaderSkeleton from "../loader/skeleton";
+import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import { Skeleton } from "../ui/skeleton";
+import { Card, CardHeader, CardContent } from "../ui/card";
+import { Separator } from "../ui/separator";
+import { Badge } from "../ui/badge";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Checkbox } from "../ui/checkbox";
+import { Button } from "../ui/button";
+import { toast } from "sonner";
 import { useGuiNames } from "@/hooks/useGuiNames";
 import { useCreateRoles } from "@/hooks/useCreateRoles";
 import { useRolesData } from "@/hooks/useRolesData";
 import { useUserDetails } from "@/hooks/useUserDetails";
-import { toast } from "sonner";
-import SubmitButton from "../ui/submitButton";
 
-interface InsertRoleProps {
-  setRoles: React.Dispatch<React.SetStateAction<any[]>>;
+// Types
+interface Role {
+  roleName: string;
+  hrefGui: string;
+  isActive: boolean;
+  makeBy: string;
+  makeDate: string;
 }
 
-const InsertRole: React.FC<InsertRoleProps> = ({ setRoles }) => {
+// Utility to format GUI paths into readable labels
+function formatGuiLabel(path: string): string {
+  const segments = path.split("/").filter(Boolean);
+  if (segments.length === 0) return "Home";
+
+  return segments
+    .map((segment) =>
+      segment.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())
+    )
+    .join(" → ");
+}
+
+const InsertRole: React.FC = () => {
   const [roleName, setRoleName] = useState("");
   const [selectedHrefGuis, setSelectedHrefGuis] = useState<string[]>([]);
   const [isActive, setIsActive] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [roles, setRoles] = useState<Role[]>([]);
+
   const userName = useUserDetails();
   const hrefOptions = useGuiNames();
-  const rolesData = useRolesData();
+  const { rolesData } = useRolesData();
   const { createRoles, loading } = useCreateRoles();
 
-  if (loading || !hrefOptions.length) return <LoaderSkeleton />;
+  useEffect(() => {
+    setRoles(rolesData);
+  }, [rolesData]);
 
   const handleHrefGuiChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
@@ -45,96 +72,124 @@ const InsertRole: React.FC<InsertRoleProps> = ({ setRoles }) => {
       return;
     }
 
-    const makeBy = userName;
-
-    const roleData = selectedHrefGuis.map((hrefGui) => ({
+    const makeDate = new Date().toISOString().split("T")[0];
+    const newRoles: Role[] = selectedHrefGuis.map((hrefGui) => ({
       roleName,
       hrefGui,
       isActive,
-      makeBy,
-      makeDate: new Date().toISOString().split("T")[0],
+      makeBy: userName,
+      makeDate,
     }));
 
     setIsSubmitting(true);
 
-    try {
-      const response = await createRoles(roleData);
+    const response = await createRoles(newRoles);
 
-      if (response?.isSuccessful) {
-        setTimeout(() => {
-          setIsSubmitting(false);
-          toast.success(response.message);
-          setRoleName("");
-          setSelectedHrefGuis([]);
-          setIsActive(true);
-          setRoles(rolesData);
-        }, 2000);
-      } else {
-        toast.error(response?.message);
-        setIsSubmitting(false);
-      }
-    } catch {
-      toast.error("Unexpected error occurred.");
-      setIsSubmitting(false);
+    if (response?.isSuccessful) {
+      toast.success(response.message);
+      setRoleName("");
+      setSelectedHrefGuis([]);
+      setIsActive(true);
+      setRoles((prev) => [...prev, ...newRoles]);
+    } else {
+      toast.error(response?.message || "Failed to create roles.");
     }
+
+    setIsSubmitting(false);
   };
 
-  return (
-    <div className="w-full m-4">
-      <div className="w-full mx-auto shadow-sm shadow-gray-800 dark:shadow-gray-300 bg-gray-300 dark:bg-gray-800">
-        <form onSubmit={handleSubmit} className="p-8 border-2">
-          {/* Role Name */}
-          <div className="flex flex-col mb-4">
-            <label
-              htmlFor="roleName"
-              className="block text-black dark:text-white text-xs font-bold py-2"
-            >
-              Role Name
-            </label>
-            <input
-              type="text"
-              id="roleName"
-              value={roleName}
-              onChange={(e) => setRoleName(e.target.value)}
-              placeholder="Enter role name..."
-              className="block w-full text-sm px-4 py-2 text-black dark:text-white bg-white dark:bg-black border rounded-xs focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
-              required
-            />
-          </div>
-
-          {/* GUI Paths */}
-          <div className="mb-4">
-            <label
-              htmlFor="hrefGui"
-              className="block text-black dark:text-white text-xs font-bold py-2"
-            >
-              GUI Path
-            </label>
-            <div className="grid grid-cols-3 gap-2">
-              {hrefOptions.map((option) => (
-                <div key={option} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id={option}
-                    value={option}
-                    checked={selectedHrefGuis.includes(option)}
-                    onChange={handleHrefGuiChange}
-                    className="mr-2"
-                  />
-                  <label htmlFor={option} className="text-sm">
-                    {option}
-                  </label>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Submit Button */}
-          <div className="mt-8">
-            <SubmitButton isSubmitting={isSubmitting} label="Submit" />
-          </div>
-        </form>
+  if (loading || !hrefOptions.length) {
+    return (
+      <div className="space-y-4">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-40 w-full" />
       </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8 p-6">
+      <Card>
+        <CardHeader>
+          <h2 className="text-xl font-semibold">Create New Role</h2>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Role Name */}
+            <div className="space-y-2">
+              <Label htmlFor="roleName">Role Name</Label>
+              <Input
+                id="roleName"
+                value={roleName}
+                onChange={(e) => setRoleName(e.target.value)}
+                placeholder="Enter role name..."
+                required
+              />
+            </div>
+
+            {/* GUI Paths */}
+            <div className="space-y-2">
+              <Label>GUI Paths</Label>
+              <Separator />
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {hrefOptions.map((option) => (
+                  <div key={option} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={option}
+                      value={option}
+                      checked={selectedHrefGuis.includes(option)}
+                      onCheckedChange={(checked) =>
+                        handleHrefGuiChange({
+                          target: {
+                            value: option,
+                            checked: checked as boolean,
+                          },
+                        } as ChangeEvent<HTMLInputElement>)
+                      }
+                    />
+                    {/* <Label htmlFor={option}>{option}</Label> */}
+                    <Label className="text-xs" htmlFor={option}>
+                      {formatGuiLabel(option)}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Submitting..." : "Submit"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
+      {/* Role List */}
+      <Card>
+        <CardHeader>
+          <h2 className="text-xl font-semibold">Existing Roles</h2>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {roles.length === 0 ? (
+            <p className="text-muted-foreground">No roles available.</p>
+          ) : (
+            roles.map((role, index) => (
+              <div key={index} className="space-y-1">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">{role.roleName}</span>
+                  <Badge variant={role.isActive ? "default" : "secondary"}>
+                    {role.isActive ? "Active" : "Inactive"}
+                  </Badge>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  GUI: {role.hrefGui}
+                </div>
+                <Separator />
+              </div>
+            ))
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };

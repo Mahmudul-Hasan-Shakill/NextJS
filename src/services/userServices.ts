@@ -60,6 +60,17 @@ export const userService = {
     return handleResponse(res);
   },
 
+  // Update user by PIN
+  async updateUserByPin(pin: string, updateUserDto: any) {
+    const res = await fetch(`${baseUrl}user/pin/${pin}`, {
+      method: "PATCH",
+      headers: getAuthHeaders(),
+      credentials: "include",
+      body: JSON.stringify(updateUserDto),
+    });
+    return handleResponse(res);
+  },
+
   // Delete user by ID
   async deleteUser(id: number) {
     const res = await fetch(`${baseUrl}user/${id}`, {

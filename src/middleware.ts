@@ -10,7 +10,12 @@ export function middleware(request: NextRequest) {
   const isTokenValid = !!token;
 
   // Define protected routes
-  const protectedRoutes = ["/home", "/account-settings"];
+  const protectedRoutes = [
+    "/home",
+    "/admin-settings",
+    "/user-profile",
+    "/core-systems",
+  ];
   const isProtectedRoute = protectedRoutes.some((route) =>
     pathname.startsWith(route)
   );
@@ -37,9 +42,11 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     "/home",
-    "/account-settings/:path*",
+    "/admin-settings/:path*",
     "/change-password",
     "/registration",
     "/reset-password",
+    "/user-profile",
+    "/core-systems/:path*",
   ],
 };

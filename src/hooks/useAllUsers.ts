@@ -1,16 +1,6 @@
 import useSWR from "swr";
 import { userService } from "@/services/userServices";
-
-export type User = {
-  id: number;
-  pin: string;
-  name: string;
-  email: string;
-  userRole: string;
-  isActive: boolean;
-  isLocked: boolean;
-  isReset: boolean;
-};
+import { Register } from "@/types/register";
 
 const fetchUsers = async () => {
   const response = await userService.getAllUsers();
@@ -24,7 +14,7 @@ const fetchUsers = async () => {
 };
 
 export function useAllUsers() {
-  const { data, error, mutate } = useSWR<User[]>("users", fetchUsers);
+  const { data, error, mutate } = useSWR<Register[]>("users", fetchUsers);
 
   return {
     users: data || [],

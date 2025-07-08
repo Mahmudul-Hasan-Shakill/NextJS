@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { FileDown } from "lucide-react";
+import { FileDown, FileSpreadsheet } from "lucide-react";
 
 type ExportCsvButtonProps<T> = {
   data: T[];
@@ -54,7 +54,7 @@ export function ExportCsvButton<T>({
       className="text-xs flex items-center gap-1 py-5"
       onClick={handleExport}
     >
-      <FileDown className="w-4 h-4" />
+      <FileSpreadsheet className="w-4 h-4" />
       Export CSV
     </Button>
   );
