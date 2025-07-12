@@ -47,8 +47,11 @@ export function SidebarDesktop({ sidebarItems }: SidebarDesktopProps) {
               className="me-3"
               priority
             />
-            <span className="self-center text-xs font-semibold sm:text-xs whitespace-nowrap text-black dark:text-white">
-              Hi, <span>{userName || "Loading..."}</span>
+            <span
+              className="self-center text-xs font-semibold sm:text-xs text-black dark:text-white max-w-[120px] truncate"
+              title={userName || "Loading..."}
+            >
+              Hi, <span className="truncate">{userName || "Loading..."}</span>
             </span>
           </Link>
         </div>
@@ -91,7 +94,10 @@ export function SidebarDesktop({ sidebarItems }: SidebarDesktopProps) {
                         <FaUserCircle className="h-4 w-4" />
                       </AvatarFallback>
                     </Avatar>
-                    <span className="text-[8px]">
+                    <span
+                      className="text-[8px] truncate max-w-[100px] inline-block"
+                      title={userName || "Loading..."}
+                    >
                       {userName || "Loading..."}
                     </span>
                   </div>

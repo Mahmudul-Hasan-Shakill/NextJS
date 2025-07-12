@@ -16,6 +16,7 @@ import MailLoader from "../loader/mailLoader";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import { ConfirmApproveDialog } from "../table/confirmApproveDialog";
+import { ConfirmBulkDeleteDialog } from "../table/confirmBulkDeleteDialog";
 
 export default function UserAction() {
   const { users, mutate } = useAllUsers();
@@ -32,6 +33,8 @@ export default function UserAction() {
   const { roleNames } = useRoleNames();
   const { updateUser } = useUpdateUser();
   const [showAnimation, setShowAnimation] = useState(false);
+  const [bulkDeleteIds, setBulkDeleteIds] = useState<(number | string)[]>([]);
+
   const handleResetPassword = async (user: Register) => {
     setShowAnimation(true);
     try {
@@ -123,6 +126,7 @@ export default function UserAction() {
         onReset={handleResetPassword}
         showApprove={true}
         onApprove={(user) => setApproveUserTarget(user)}
+        onBulkDelete={(ids) => setBulkDeleteIds(ids)}
       />
 
       {viewUser && (
@@ -160,6 +164,23 @@ export default function UserAction() {
           open={!!deleteUserTarget}
           onClose={() => setDeleteUserTarget(null)}
           onConfirm={handleDeleteUser}
+        />
+      )}
+
+      {bulkDeleteIds.length > 0 && (
+        <ConfirmBulkDeleteDialog
+          ids={bulkDeleteIds}
+          open={bulkDeleteIds.length > 0}
+          onClose={() => setBulkDeleteIds([])}
+          onConfirm={async (ids) => {
+            try {
+              await Promise.all(ids.map((id) => deleteUser(Number(id))));
+              setBulkDeleteIds([]);
+              mutate();
+            } catch (error) {
+              console.error("Bulk delete failed:", error);
+            }
+          }}
         />
       )}
     </div>

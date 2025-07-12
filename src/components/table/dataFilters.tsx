@@ -38,14 +38,6 @@ export function DataFilter<T extends object>({
     );
   }, [uniqueValues, search]);
 
-  const toggleFilter = (value: any) => {
-    const exists = selectedFilters.some((v) => v === value);
-    const updated = exists
-      ? selectedFilters.filter((v) => v !== value)
-      : [...selectedFilters, value];
-    onFilterChange(updated);
-    console.log("selectedFilters:", selectedFilters);
-  };
 
   const isAllSelected =
     uniqueValues.length > 0 && selectedFilters.length === uniqueValues.length;
