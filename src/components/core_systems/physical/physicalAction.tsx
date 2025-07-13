@@ -9,20 +9,22 @@ import { EditModal } from "../../table/editModal";
 import { useAllPhysicals } from "@/hooks/core_systems/physical/useAllPhysicals";
 import { useDeletePhysical } from "@/hooks/core_systems/physical/useDeletePhysical";
 import { useUpdatePhysical } from "@/hooks/core_systems/physical/useUpdatePhysical";
-import { Physical } from "@/types/physical";
+import { PhysicalEdit } from "@/types/physical";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { ConfirmBulkDeleteDialog } from "@/components/table/confirmBulkDeleteDialog";
 
 export default function PhysicalAction() {
   const { physicals, mutate } = useAllPhysicals();
-  const [viewPhysical, setViewPhysical] = useState<Physical | null>(null);
-  const [editPhysical, setEditPhysical] = useState<Physical | null>(null);
+  const [viewPhysical, setViewPhysical] = useState<PhysicalEdit | null>(null);
+  const [editPhysical, setEditPhysical] = useState<PhysicalEdit | null>(null);
   const [deletePhysicalTarget, setDeletePhysicalTarget] =
-    useState<Physical | null>(null);
+    useState<PhysicalEdit | null>(null);
   const { deletePhysical } = useDeletePhysical();
   const { updatePhysical } = useUpdatePhysical();
+  const [bulkDeleteIds, setBulkDeleteIds] = useState<(number | string)[]>([]);
 
-  const handleDeletePhysical = async (physical: Physical) => {
+  const handleDeletePhysical = async (physical: PhysicalEdit) => {
     try {
       await deletePhysical(physical.id);
       setDeletePhysicalTarget(null);
@@ -31,12 +33,12 @@ export default function PhysicalAction() {
     } catch (error) {}
   };
 
-  const handleUpdatePhysical = async (updated: Physical) => {
+  const handleUpdatePhysical = async (updated: PhysicalEdit) => {
     try {
       const editableKeys = columns.map((col) => col.key);
       const payload = Object.fromEntries(
         Object.entries(updated).filter(([key]) =>
-          editableKeys.includes(key as keyof Physical)
+          editableKeys.includes(key as keyof PhysicalEdit)
         )
       );
       await updatePhysical(updated.id, payload);
@@ -45,7 +47,7 @@ export default function PhysicalAction() {
     } catch (error) {}
   };
 
-  const columns: Column<Physical>[] = [
+  const columns: Column<PhysicalEdit>[] = [
     {
       key: "deviceCategory",
       label: "Device Category",
@@ -127,6 +129,7 @@ export default function PhysicalAction() {
         onView={(row) => setViewPhysical(row)}
         onEdit={(row) => setEditPhysical(row)}
         onDelete={(row) => setDeletePhysicalTarget(row)}
+        onBulkDelete={(ids) => setBulkDeleteIds(ids)}
       />
 
       {viewPhysical && (
@@ -153,6 +156,22 @@ export default function PhysicalAction() {
           open={!!deletePhysicalTarget}
           onClose={() => setDeletePhysicalTarget(null)}
           onConfirm={handleDeletePhysical}
+        />
+      )}
+      {bulkDeleteIds.length > 0 && (
+        <ConfirmBulkDeleteDialog
+          ids={bulkDeleteIds}
+          open={bulkDeleteIds.length > 0}
+          onClose={() => setBulkDeleteIds([])}
+          onConfirm={async (ids) => {
+            try {
+              await Promise.all(ids.map((id) => deletePhysical(Number(id))));
+              setBulkDeleteIds([]);
+              mutate();
+            } catch (error) {
+              console.error("Bulk delete failed:", error);
+            }
+          }}
         />
       )}
     </div>

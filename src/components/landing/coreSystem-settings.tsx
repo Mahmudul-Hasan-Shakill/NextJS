@@ -25,4 +25,28 @@ export const projects = [
     title: "Physical Server Update",
     link: "/core-systems/physical-server-update",
   },
+  {
+    title: "Application Server Creation",
+    link: "/core-systems/application-server-creation",
+  },
+  {
+    title: "Application Server Update",
+    link: "/core-systems/application-server-update",
+  },
+  {
+    title: "AMC Creation",
+    link: "/core-systems/amc-creation",
+  },
+  {
+    title: "AMC Update",
+    link: "/core-systems/amc-update",
+  },
+  {
+    title: "Database Server Creation",
+    link: "/core-systems/database-server-creation",
+  },
+  {
+    title: "Database Server Update",
+    link: "/core-systems/database-server-update",
+  },
 ];

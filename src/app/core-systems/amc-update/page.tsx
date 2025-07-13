@@ -1,22 +1,22 @@
 import MainLayout from "@/components/layout/main-layout";
 import React from "react";
 import Breadcrumb from "@/components/breadcrumb/breadcrumb";
-import { VmRegister } from "@/components/core_systems/vm/vmRegister";
+import AmcAction from "@/components/core_systems/amc/amcAction";
 
 export const metadata = {
-  title: "VM-Creation",
+  title: "AMC-Update",
   description: "Developed by Core Systems",
 };
 
-const VmCreation: React.FC = () => {
+const AmcUpdate: React.FC = () => {
   return (
     <>
       <MainLayout>
         <Breadcrumb pageName={metadata.title} />
-        <VmRegister />
+        <AmcAction />
       </MainLayout>
     </>
   );
 };
 
-export default VmCreation;
+export default AmcUpdate;

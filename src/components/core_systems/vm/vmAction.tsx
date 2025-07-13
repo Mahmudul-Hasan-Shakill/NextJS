@@ -9,19 +9,21 @@ import { EditModal } from "../../table/editModal";
 import { useAllVms } from "@/hooks/core_systems/vm/useGetAllVms";
 import { useDeleteVm } from "@/hooks/core_systems/vm/useDeleteVm";
 import { useUpdateVm } from "@/hooks/core_systems/vm/useUpdateVm";
-import { Vm } from "@/types/vm";
+import { VmEdit } from "@/types/vm";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { ConfirmBulkDeleteDialog } from "@/components/table/confirmBulkDeleteDialog";
 
 export default function VmAction() {
   const { vms, mutate } = useAllVms();
-  const [viewVm, setViewVm] = useState<Vm | null>(null);
-  const [editVm, setEditVm] = useState<Vm | null>(null);
-  const [deleteVmTarget, setDeleteVmTarget] = useState<Vm | null>(null);
+  const [viewVm, setViewVm] = useState<VmEdit | null>(null);
+  const [editVm, setEditVm] = useState<VmEdit | null>(null);
+  const [deleteVmTarget, setDeleteVmTarget] = useState<VmEdit | null>(null);
   const { deleteVm } = useDeleteVm();
   const { updateVm } = useUpdateVm();
+  const [bulkDeleteIds, setBulkDeleteIds] = useState<(number | string)[]>([]);
 
-  const handleDeleteVm = async (vm: Vm) => {
+  const handleDeleteVm = async (vm: VmEdit) => {
     try {
       await deleteVm(vm.id);
       setDeleteVmTarget(null);
@@ -30,12 +32,12 @@ export default function VmAction() {
     } catch (error) {}
   };
 
-  const handleUpdateVm = async (updated: Vm) => {
+  const handleUpdateVm = async (updated: VmEdit) => {
     try {
       const editableKeys = columns.map((col) => col.key);
       const payload = Object.fromEntries(
         Object.entries(updated).filter(([key]) =>
-          editableKeys.includes(key as keyof Vm)
+          editableKeys.includes(key as keyof VmEdit)
         )
       );
       await updateVm(updated.id, payload);
@@ -44,7 +46,7 @@ export default function VmAction() {
     } catch (error) {}
   };
 
-  const columns: Column<Vm>[] = [
+  const columns: Column<VmEdit>[] = [
     {
       key: "deviceCategory",
       label: "Device Category",
@@ -128,6 +130,7 @@ export default function VmAction() {
         onView={(vm) => setViewVm(vm)}
         onEdit={(vm) => setEditVm(vm)}
         onDelete={(vm) => setDeleteVmTarget(vm)}
+        onBulkDelete={(ids) => setBulkDeleteIds(ids)}
       />
       {viewVm && (
         <ViewModal
@@ -151,6 +154,22 @@ export default function VmAction() {
           open={!!deleteVmTarget}
           onClose={() => setDeleteVmTarget(null)}
           onConfirm={handleDeleteVm}
+        />
+      )}
+      {bulkDeleteIds.length > 0 && (
+        <ConfirmBulkDeleteDialog
+          ids={bulkDeleteIds}
+          open={bulkDeleteIds.length > 0}
+          onClose={() => setBulkDeleteIds([])}
+          onConfirm={async (ids) => {
+            try {
+              await Promise.all(ids.map((id) => deleteVm(Number(id))));
+              setBulkDeleteIds([]);
+              mutate();
+            } catch (error) {
+              console.error("Bulk delete failed:", error);
+            }
+          }}
         />
       )}
     </div>

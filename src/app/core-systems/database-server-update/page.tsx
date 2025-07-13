@@ -1,22 +1,22 @@
 import MainLayout from "@/components/layout/main-layout";
 import React from "react";
 import Breadcrumb from "@/components/breadcrumb/breadcrumb";
-import { VmRegister } from "@/components/core_systems/vm/vmRegister";
+import DatabaseAction from "@/components/core_systems/database/databaseAction";
 
 export const metadata = {
-  title: "VM-Creation",
+  title: "Database-Server-Update",
   description: "Developed by Core Systems",
 };
 
-const VmCreation: React.FC = () => {
+const DatabaseUpdate: React.FC = () => {
   return (
     <>
       <MainLayout>
         <Breadcrumb pageName={metadata.title} />
-        <VmRegister />
+        <DatabaseAction />
       </MainLayout>
     </>
   );
 };
 
-export default VmCreation;
+export default DatabaseUpdate;

@@ -5,7 +5,7 @@ import DataLoader from "../../loader/dataLoader";
 import { toast } from "sonner";
 import { useUserDetails } from "@/hooks/user/useUserDetails";
 import { useCreateVm } from "@/hooks/core_systems/vm/useCreateVm";
-import { VmData } from "@/types/vm";
+import { VmReg } from "@/types/vm";
 import { EditField } from "@/components/table/editFields";
 import UniversalButton from "@/components/ui/universalButton";
 
@@ -13,7 +13,7 @@ export function VmRegister() {
   const { createVm, loading } = useCreateVm();
   const userName = useUserDetails();
 
-  const requiredFields: (keyof VmData)[] = [
+  const requiredFields: (keyof VmReg)[] = [
     "deviceCategory",
     "hostname",
     "osIpAddress",
@@ -23,7 +23,7 @@ export function VmRegister() {
     "serverStatus",
   ];
 
-  const numericFields: (keyof VmData)[] = [
+  const numericFields: (keyof VmReg)[] = [
     "sshPort",
     "volumeSize",
     "totalSocket",
@@ -33,7 +33,7 @@ export function VmRegister() {
     "physicalId",
   ];
 
-  const initialState: VmData = {
+  const initialState: VmReg = {
     deviceCategory: "",
     hostname: "",
     osIpAddress: "",
@@ -79,7 +79,7 @@ export function VmRegister() {
     physicalId: undefined,
   };
 
-  const [formData, setFormData] = useState<VmData>(initialState);
+  const [formData, setFormData] = useState<VmReg>(initialState);
 
   const handleChange = (
     e: React.ChangeEvent<any> | { target: { id: string; value: any } }
@@ -107,7 +107,7 @@ export function VmRegister() {
       return;
     }
 
-    const payload: VmData = {
+    const payload: VmReg = {
       ...formData,
       makeBy: userName,
       makeDate: new Date(),
@@ -171,7 +171,7 @@ export function VmRegister() {
             key={name}
             name={name}
             label={
-              requiredFields.includes(name as keyof VmData) ? (
+              requiredFields.includes(name as keyof VmReg) ? (
                 <>
                   {label} <span className="text-red-500">*</span>
                 </>
@@ -180,7 +180,7 @@ export function VmRegister() {
               )
             }
             type={type}
-            value={formData[name as keyof VmData]}
+            value={formData[name as keyof VmReg]}
             onChange={handleChange}
             options={options}
             className="text-[10px]"
@@ -234,7 +234,7 @@ export function VmRegister() {
             key={name}
             name={name}
             label={
-              requiredFields.includes(name as keyof VmData) ? (
+              requiredFields.includes(name as keyof VmReg) ? (
                 <>
                   {label} <span className="text-red-500">*</span>
                 </>
@@ -243,7 +243,7 @@ export function VmRegister() {
               )
             }
             type={type}
-            value={formData[name as keyof VmData]}
+            value={formData[name as keyof VmReg]}
             onChange={handleChange}
             className="text-[10px]"
           />
@@ -259,7 +259,7 @@ export function VmRegister() {
             key={name}
             name={name}
             label={
-              requiredFields.includes(name as keyof VmData) ? (
+              requiredFields.includes(name as keyof VmReg) ? (
                 <>
                   {label} <span className="text-red-500">*</span>
                 </>
@@ -268,7 +268,7 @@ export function VmRegister() {
               )
             }
             type="boolean"
-            value={formData[name as keyof VmData]}
+            value={formData[name as keyof VmReg]}
             onChange={handleChange}
             className="text-[10px]"
           />

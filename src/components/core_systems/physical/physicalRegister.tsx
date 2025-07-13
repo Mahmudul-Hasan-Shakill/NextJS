@@ -6,14 +6,14 @@ import { toast } from "sonner";
 import { useUserDetails } from "@/hooks/user/useUserDetails";
 import { useCreatePhysical } from "@/hooks/core_systems/physical/useCreatePhysical";
 import { EditField } from "@/components/table/editFields";
-import { PhysicalData } from "@/types/physical";
+import { PhysicalReg } from "@/types/physical";
 import UniversalButton from "@/components/ui/universalButton";
 
 export function PhysicalRegister() {
   const { createPhysical, loading } = useCreatePhysical();
   const userName = useUserDetails();
 
-  const requiredFields: (keyof PhysicalData)[] = [
+  const requiredFields: (keyof PhysicalReg)[] = [
     "deviceCategory",
     "hostname",
     "primaryIdentificationName",
@@ -28,7 +28,7 @@ export function PhysicalRegister() {
     "osVersion",
   ];
 
-  const initialState: PhysicalData = {
+  const initialState: PhysicalReg = {
     deviceCategory: "",
     hostname: "",
     primaryIdentificationName: "",
@@ -82,7 +82,7 @@ export function PhysicalRegister() {
     vmIds: [],
   };
 
-  const [formData, setFormData] = useState<PhysicalData>(initialState);
+  const [formData, setFormData] = useState<PhysicalReg>(initialState);
 
   const handleChange = (
     e: React.ChangeEvent<any> | { target: { id: string; value: any } }
@@ -110,7 +110,7 @@ export function PhysicalRegister() {
       return;
     }
 
-    const numericFields: (keyof PhysicalData)[] = [
+    const numericFields: (keyof PhysicalReg)[] = [
       "numberOfNICCards",
       "numberOfNICPorts",
       "numberOfHBACards",
@@ -124,7 +124,7 @@ export function PhysicalRegister() {
     ];
 
     // Create a new payload with numeric fields converted
-    const payload: PhysicalData = {
+    const payload: PhysicalReg = {
       ...formData,
       makeBy: userName,
       makeDate: new Date(),
@@ -194,7 +194,7 @@ export function PhysicalRegister() {
             key={name}
             name={name}
             label={
-              requiredFields.includes(name as keyof PhysicalData) ? (
+              requiredFields.includes(name as keyof PhysicalReg) ? (
                 <>
                   {label} <span className="text-red-500">*</span>
                 </>
@@ -203,7 +203,7 @@ export function PhysicalRegister() {
               )
             }
             type={type}
-            value={formData[name as keyof PhysicalData]}
+            value={formData[name as keyof PhysicalReg]}
             onChange={handleChange}
             options={options}
             className="text-[10px]"
@@ -262,7 +262,7 @@ export function PhysicalRegister() {
             key={name}
             name={name}
             label={
-              requiredFields.includes(name as keyof PhysicalData) ? (
+              requiredFields.includes(name as keyof PhysicalReg) ? (
                 <>
                   {label} <span className="text-red-500">*</span>
                 </>
@@ -271,7 +271,7 @@ export function PhysicalRegister() {
               )
             }
             type={type}
-            value={formData[name as keyof PhysicalData]}
+            value={formData[name as keyof PhysicalReg]}
             onChange={handleChange}
             className="text-[10px]"
           />
@@ -289,7 +289,7 @@ export function PhysicalRegister() {
             name={name}
             label={label}
             type="boolean"
-            value={formData[name as keyof PhysicalData]}
+            value={formData[name as keyof PhysicalReg]}
             onChange={handleChange}
             className="text-[10px]"
           />
@@ -305,7 +305,7 @@ export function PhysicalRegister() {
             name={name}
             label={label}
             type="date"
-            value={formData[name as keyof PhysicalData]}
+            value={formData[name as keyof PhysicalReg]}
             onChange={handleChange}
             className="text-[10px]"
           />

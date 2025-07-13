@@ -28,7 +28,7 @@
 
 import useSWR from "swr";
 import { vmService } from "@/services/core_systems/vmServices";
-import { Vm } from "@/types/vm";
+import { VmEdit } from "@/types/vm";
 
 const fetchVms = async () => {
   const response = await vmService.getAllVms();
@@ -42,7 +42,7 @@ const fetchVms = async () => {
 };
 
 export function useAllVms() {
-  const { data, error, mutate } = useSWR<Vm[]>("vms", fetchVms);
+  const { data, error, mutate } = useSWR<VmEdit[]>("vms", fetchVms);
 
   return {
     vms: data || [],

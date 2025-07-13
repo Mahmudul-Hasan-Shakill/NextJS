@@ -43,7 +43,6 @@ export function ConfirmDeleteDialog<T>({
             size="sm"
             variant="destructive"
             onClick={() => onConfirm(row)}
-            className="bg-red-400 hover:bg-red-500"
           >
             Delete
           </Button>
