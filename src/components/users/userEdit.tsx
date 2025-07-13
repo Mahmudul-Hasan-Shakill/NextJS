@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { useUpdateUserByPin } from "@/hooks/useUpdateUserByPin";
+import { useUpdateUserByPin } from "@/hooks/user/useUpdateUserByPin";
 import { toast } from "sonner";
 import { Select } from "@/components/ui/selects";
 

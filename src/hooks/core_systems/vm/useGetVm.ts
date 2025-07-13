@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { toast } from "sonner";
-import { vmService } from "@/services/vmServices";
+import { vmService } from "@/services/core_systems/vmServices";
 
 export function useGetVm() {
   const [vm, setVm] = useState<any>(null);

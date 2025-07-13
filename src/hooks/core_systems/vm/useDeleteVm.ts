@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { vmService } from "@/services/vmServices";
+import { vmService } from "@/services/core_systems/vmServices";
 import { toast } from "sonner";
 
 export function useDeleteVm() {

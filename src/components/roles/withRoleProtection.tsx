@@ -4,7 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { decrypt } from "@/services/secretService";
-import { useRolesData } from "@/hooks/useRolesData";
+import { useRolesData } from "@/hooks/role/useRolesData";
 
 export function withRoleProtection<T extends object>(
   Component: React.ComponentType<T>

@@ -3,10 +3,11 @@
 import React, { useState } from "react";
 import DataLoader from "../../loader/dataLoader";
 import { toast } from "sonner";
-import { useUserDetails } from "@/hooks/useUserDetails";
-import { useCreatePhysical } from "@/hooks/useCreatePhysical";
+import { useUserDetails } from "@/hooks/user/useUserDetails";
+import { useCreatePhysical } from "@/hooks/core_systems/physical/useCreatePhysical";
 import { EditField } from "@/components/table/editFields";
 import { PhysicalData } from "@/types/physical";
+import UniversalButton from "@/components/ui/universalButton";
 
 export function PhysicalRegister() {
   const { createPhysical, loading } = useCreatePhysical();
@@ -166,9 +167,12 @@ export function PhysicalRegister() {
             label: "Device Category",
             type: "select",
             options: [
-              { value: "Server", label: "Server" },
-              { value: "Storage", label: "Storage" },
               { value: "Backup", label: "Backup" },
+              { value: "HSM", label: "HSM" },
+              { value: "Power Server", label: "Power Server" },
+              { value: "Server Blade", label: "Server Blade" },
+              { value: "Server Rack", label: "Server Rack" },
+              { value: "Storage", label: "Storage" },
               { value: "Switch", label: "Switch" },
             ],
           },
@@ -177,9 +181,12 @@ export function PhysicalRegister() {
             label: "Zone",
             type: "select",
             options: [
-              { value: "DMZ", label: "DMZ" },
-              { value: "Internal", label: "Internal" },
-              { value: "External", label: "External" },
+              { value: "DR DMZ", label: "DR DMZ" },
+              { value: "DR MZ", label: "DR MZ" },
+              { value: "PROD DMZ", label: "PROD DMZ" },
+              { value: "PROD MZ", label: "PROD MZ" },
+              { value: "TEST DMZ", label: "TEST DMZ" },
+              { value: "TEST MZ", label: "TEST MZ" },
             ],
           },
         ].map(({ name, label, type, options }) => (
@@ -317,12 +324,7 @@ export function PhysicalRegister() {
         </div>
 
         {/* Submit Button */}
-        <button
-          className="group/btn relative block col-span-1 md:col-span-2 mt-4 h-10 w-full rounded-md bg-gradient-to-br from-black to-neutral-600 font-medium text-white shadow dark:bg-zinc-800"
-          type="submit"
-        >
-          Submit &rarr; <BottomGradient />
-        </button>
+        <UniversalButton type="submit">Submit &rarr;</UniversalButton>
       </form>
     </div>
   );
@@ -333,12 +335,3 @@ function formatLabel(field: string): string {
     .replace(/([A-Z])/g, " $1")
     .replace(/^./, (str) => str.toUpperCase());
 }
-
-const BottomGradient = () => {
-  return (
-    <>
-      <span className="absolute inset-x-0 -bottom-px block h-px w-full bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-0 transition duration-500 group-hover/btn:opacity-100" />
-      <span className="absolute inset-x-10 -bottom-px mx-auto block h-px w-1/2 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-0 blur-sm transition duration-500 group-hover/btn:opacity-100" />
-    </>
-  );
-};

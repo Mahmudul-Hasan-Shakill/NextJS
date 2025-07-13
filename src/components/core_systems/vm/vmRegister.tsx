@@ -3,10 +3,11 @@
 import React, { useState } from "react";
 import DataLoader from "../../loader/dataLoader";
 import { toast } from "sonner";
-import { useUserDetails } from "@/hooks/useUserDetails";
-import { useCreateVm } from "@/hooks/useCreateVm";
+import { useUserDetails } from "@/hooks/user/useUserDetails";
+import { useCreateVm } from "@/hooks/core_systems/vm/useCreateVm";
 import { VmData } from "@/types/vm";
 import { EditField } from "@/components/table/editFields";
+import UniversalButton from "@/components/ui/universalButton";
 
 export function VmRegister() {
   const { createVm, loading } = useCreateVm();
@@ -282,12 +283,7 @@ export function VmRegister() {
             className="text-[10px]"
           />
         </div>
-        <button
-          className="group/btn relative block col-span-1 md:col-span-2 mt-4 h-10 w-full rounded-md bg-gradient-to-br from-black to-neutral-600 font-medium text-white shadow dark:bg-zinc-800"
-          type="submit"
-        >
-          Submit &rarr; <BottomGradient />
-        </button>
+        <UniversalButton type="submit">Submit &rarr;</UniversalButton>
       </form>
     </div>
   );
@@ -299,11 +295,3 @@ function formatLabel(field: string): string {
     .replace(/^./, (str) => str.toUpperCase());
 }
 
-const BottomGradient = () => {
-  return (
-    <>
-      <span className="absolute inset-x-0 -bottom-px block h-px w-full bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-0 transition duration-500 group-hover/btn:opacity-100" />
-      <span className="absolute inset-x-10 -bottom-px mx-auto block h-px w-1/2 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-0 blur-sm transition duration-500 group-hover/btn:opacity-100" />
-    </>
-  );
-};

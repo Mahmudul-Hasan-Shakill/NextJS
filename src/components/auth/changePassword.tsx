@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { IoIosEye, IoIosEyeOff } from "react-icons/io";
 import { toast } from "sonner";
-import { useChangePassword } from "@/hooks/useChangePassword";
-import { useUserByPin } from "@/hooks/useUserByPin";
+import { useChangePassword } from "@/hooks/auth/useChangePassword";
+import { useUserByPin } from "@/hooks/user/useUserByPin";
 import SubmitButton from "../ui/submitButton";
 import { Key, RotateCcwKey } from "lucide-react";
 

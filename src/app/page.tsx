@@ -11,22 +11,42 @@ export default function Home() {
         <div className="hidden md:flex md:w-3/5 bg-white dark:bg-black items-center justify-center">
           <div className="max-w-md p-4">
             <div className="block dark:hidden">
-              <Image
+              {/* <Image
                 src={LogoBlack}
                 alt="BRAC Bank Logo"
                 width={400}
                 height={200}
                 className="mx-auto"
-              />
+                priority
+              /> */}
+              <div className="relative w-[400px] h-[200px] mx-auto">
+                <Image
+                  src={LogoBlack}
+                  alt="BRAC Bank Logo"
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
             </div>
             <div className="hidden dark:block">
-              <Image
+              {/* <Image
                 src={LogoWhite}
                 alt="BRAC Bank Logo"
                 width={400}
                 height={200}
                 className="mx-auto"
-              />
+                priority
+              /> */}
+              <div className="relative w-[400px] h-[200px] mx-auto">
+                <Image
+                  src={LogoWhite}
+                  alt="BRAC Bank Logo"
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
             </div>
             <h1 className="mt-6 text-center text-xl text-black dark:text-white tracking-[.15em]">
               Technology Infrastructure and Systems Management Inventory

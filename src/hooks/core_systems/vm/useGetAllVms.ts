@@ -27,7 +27,7 @@
 // }
 
 import useSWR from "swr";
-import { vmService } from "@/services/vmServices";
+import { vmService } from "@/services/core_systems/vmServices";
 import { Vm } from "@/types/vm";
 
 const fetchVms = async () => {

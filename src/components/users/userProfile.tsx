@@ -1,6 +1,6 @@
 "use client";
 
-import { useUserByPin } from "@/hooks/useUserByPin";
+import { useUserByPin } from "@/hooks/user/useUserByPin";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";

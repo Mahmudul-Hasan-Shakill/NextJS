@@ -34,7 +34,7 @@ export const BarChartComponent = ({
           <XAxis dataKey="name" stroke="currentColor" />
           <YAxis stroke="currentColor" />
           <Tooltip />
-          <Legend />
+          {/* <Legend /> */}
           <Bar
             dataKey="value"
             radius={[4, 4, 0, 0]}

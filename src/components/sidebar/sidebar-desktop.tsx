@@ -14,8 +14,8 @@ import { Button } from "../ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import RoleBasedAccess from "../roles/roleBasedAccess";
 import { ModeToggle } from "../theme-button";
-import { useUserDetails } from "@/hooks/useUserDetails";
-import { useRolesData } from "@/hooks/useRolesData";
+import { useUserDetails } from "@/hooks/user/useUserDetails";
+import { useRolesData } from "@/hooks/role/useRolesData";
 import Logo from "@/../public/images/common/logo.png";
 import LogoutButton from "../auth/logout";
 
@@ -64,7 +64,10 @@ export function SidebarDesktop({ sidebarItems }: SidebarDesktopProps) {
                 <RoleBasedAccess allowedRoles={allowedRoles} key={index}>
                   <Link href={link.href}>
                     <SidebarButton
-                      variant={pathname === link.href ? "secondary" : "ghost"}
+                      // variant={pathname === link.href ? "secondary" : "ghost"}
+                      variant={
+                        pathname.startsWith(link.href) ? "secondary" : "ghost"
+                      }
                       icon={link.icon}
                       className="w-full text-xs"
                     >

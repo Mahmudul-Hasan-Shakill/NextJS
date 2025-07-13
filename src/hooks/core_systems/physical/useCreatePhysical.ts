@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { toast } from "sonner";
-import { physicalService } from "@/services/physicalServices";
+import { physicalService } from "@/services/core_systems/physicalServices";
 
 export function useCreatePhysical() {
   const [loading, setLoading] = useState(false);

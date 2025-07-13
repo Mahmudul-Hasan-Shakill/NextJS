@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useResetPassword } from "@/hooks/useResetPassword";
+import { useResetPassword } from "@/hooks/auth/useResetPassword";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { MdEmail, MdPin } from "react-icons/md";
@@ -59,7 +59,7 @@ const ResetPassword = () => {
     <div className="text-xs flex justify-center items-center min-h-screen bg-white dark:bg-black">
       <form
         onSubmit={handleSubmit}
-        className="bg-gray-300 dark:bg-gray-800 shadow-lg rounded-lg p-8 w-full max-w-md"
+        className="bg-gray-300 dark:bg-gray-800 shadow-lg shadow-gray-600 dark:shadow-gray-400 rounded-lg p-8 w-full max-w-md"
       >
         <h2 className="text-black dark:text-white text-lg font-bold mb-4 text-center">
           Reset Password

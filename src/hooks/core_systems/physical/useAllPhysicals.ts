@@ -1,6 +1,6 @@
 "use client";
 import useSWR from "swr";
-import { physicalService } from "@/services/physicalServices";
+import { physicalService } from "@/services/core_systems/physicalServices";
 
 const fetchPhysicals = async () => {
   const response = await physicalService.getAllPhysicals();

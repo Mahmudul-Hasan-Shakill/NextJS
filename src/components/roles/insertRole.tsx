@@ -10,10 +10,10 @@ import { Label } from "../ui/label";
 import { Checkbox } from "../ui/checkbox";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
-import { useGuiNames } from "@/hooks/useGuiNames";
-import { useCreateRoles } from "@/hooks/useCreateRoles";
-import { useRolesData } from "@/hooks/useRolesData";
-import { useUserDetails } from "@/hooks/useUserDetails";
+import { useGuiNames } from "@/hooks/role/useGuiNames";
+import { useCreateRoles } from "@/hooks/role/useCreateRoles";
+import { useRolesData } from "@/hooks/role/useRolesData";
+import { useUserDetails } from "@/hooks/user/useUserDetails";
 
 // Types
 interface Role {

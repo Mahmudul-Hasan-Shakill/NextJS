@@ -168,10 +168,10 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
-import { useUserDetails } from "@/hooks/useUserDetails";
-import { useRoleNames } from "@/hooks/useRoleNames";
-import { useGuiByRoleName } from "@/hooks/useGuiByRoleName";
-import { useUpdateRole } from "@/hooks/useUpdateRole";
+import { useUserDetails } from "@/hooks/user/useUserDetails";
+import { useRoleNames } from "@/hooks/role/useRoleNames";
+import { useGuiByRoleName } from "@/hooks/role/useGuiByRoleName";
+import { useUpdateRole } from "@/hooks/role/useUpdateRole";
 
 interface HrefGui {
   hrefGui: string;
