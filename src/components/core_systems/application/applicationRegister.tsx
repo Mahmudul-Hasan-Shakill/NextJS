@@ -8,10 +8,12 @@ import { useCreateApplication } from "@/hooks/core_systems/application/useCreate
 import { ApplicationReg } from "@/types/application";
 import { EditField } from "@/components/table/editFields";
 import UniversalButton from "@/components/ui/universalButton";
+import { useGetVmIp } from "@/hooks/core_systems/vm/useGetVmIp";
 
 export function ApplicationRegister() {
   const { createApplication, loading } = useCreateApplication();
   const userName = useUserDetails();
+  const { vmIp } = useGetVmIp();
 
   const requiredFields: (keyof ApplicationReg)[] = [
     "environment",
@@ -21,6 +23,7 @@ export function ApplicationRegister() {
     "appModule",
     "appOwner",
     "appOwnerEmail",
+    "vmIds",
   ];
 
   const initialState: ApplicationReg = {
@@ -46,6 +49,7 @@ export function ApplicationRegister() {
     makeDate: undefined,
     editBy: "",
     editDate: undefined,
+    vmIds: [],
   };
 
   const [formData, setFormData] = useState<ApplicationReg>(initialState);

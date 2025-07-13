@@ -23,6 +23,7 @@ export type Column<T> = {
   type?:
     | "text"
     | "select"
+    | "multiselect"
     | "boolean"
     | "number"
     | "date"

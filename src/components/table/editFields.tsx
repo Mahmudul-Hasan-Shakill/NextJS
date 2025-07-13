@@ -4,6 +4,7 @@ import { Select } from "@/components/ui/selects";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { ReactNode } from "react";
+import { MultiSelect } from "../ui/multiSelect";
 
 type Option = { label: string; value: any };
 
@@ -44,6 +45,21 @@ export function EditField({
             onChange={onChange}
             options={options}
             placeholder="-- Select an option --"
+            className={className}
+          />
+        </div>
+      );
+
+    case "multiselect":
+      return (
+        <div className={className}>
+          <Label className={className}>{label}</Label>
+          <MultiSelect
+            name={name}
+            values={Array.isArray(value) ? value : []}
+            onChange={onChange}
+            options={options}
+            placeholder="-- Select one or more options --"
             className={className}
           />
         </div>
