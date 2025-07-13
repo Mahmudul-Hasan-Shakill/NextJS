@@ -77,9 +77,11 @@ export default function UserProfile() {
 
 function ProfileField({ label, value }: { label: string; value: string }) {
   return (
-    <div>
+    <div className="break-words">
       <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="text-xs font-medium text-foreground">{value}</p>
+      <p className="text-xs font-medium text-foreground break-words whitespace-pre-wrap">
+        {value}
+      </p>
     </div>
   );
 }
