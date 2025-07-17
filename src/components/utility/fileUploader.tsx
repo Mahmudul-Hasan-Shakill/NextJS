@@ -54,7 +54,14 @@ export default function FileUploader({
   };
 
   const handleUpload = () => {
-    if (files) uploadFiles(files, folder, baseFilename);
+    if (files) {
+      uploadFiles(files, folder, baseFilename);
+      setFiles(null);
+      const input = document.getElementById(
+        `file-input-${folder}`
+      ) as HTMLInputElement;
+      if (input) input.value = "";
+    }
   };
 
   return (
@@ -75,6 +82,7 @@ export default function FileUploader({
           Drag and drop files here or click to select
         </p>
         <input
+          id={`file-input-${folder}`}
           type="file"
           multiple
           accept={allowedTypes.join(",")}
