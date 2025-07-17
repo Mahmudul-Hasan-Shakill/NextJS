@@ -1,4 +1,3 @@
-// components/FileUploader.tsx
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useFileUploader } from "@/hooks/utility/useFileUploader";
@@ -29,7 +28,10 @@ export default function FileUploader({
   const [dragOver, setDragOver] = useState(false);
   const [files, setFiles] = useState<FileList | null>(null);
   const { uploadFiles, uploading, progress, uploadedPaths } = useFileUploader();
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+
+  const fileAccessBaseUrl =
+    process.env.NEXT_PUBLIC_FILE_BASE_URL ?? "http://localhost:4000/uploads/";
+
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setDragOver(false);
@@ -79,6 +81,15 @@ export default function FileUploader({
           onChange={(e) => setFiles(e.target.files)}
           className="mt-2"
         />
+        {files && files.length > 0 && (
+          <ul className="mt-2 text-sm text-gray-700">
+            {Array.from(files).map((file, idx) => (
+              <li key={idx} className="truncate">
+                📄 {file.name}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       <button
@@ -98,22 +109,22 @@ export default function FileUploader({
         </div>
       )}
 
-      {Array.isArray(uploadedPaths) && uploadedPaths.length > 0 && (
+      {/* {Array.isArray(uploadedPaths) && uploadedPaths.length > 0 && (
         <ul className="mt-4 space-y-2">
           {uploadedPaths.map((path) => (
             <li key={path}>
               <a
-                href={`${baseUrl}${path}`}
+                href={`${fileAccessBaseUrl}${path.split("/uploads/")[1]}`}
                 target="_blank"
                 rel="noreferrer"
                 className="text-blue-600 hover:underline"
               >
-                {path}
+                {path.split("/").pop()}
               </a>
             </li>
           ))}
         </ul>
-      )}
+      )} */}
     </div>
   );
 }
