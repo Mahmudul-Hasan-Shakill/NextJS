@@ -137,9 +137,15 @@ export function DataTable<T extends { id: number | string }>({
     [totalPages]
   );
 
-  const displayedColumns = visibleColumns
-    .map((key) => columns.find((col) => col.key === key))
-    .filter((col): col is Column<T> => col !== undefined);
+  // const displayedColumns = visibleColumns
+  //   .map((key) => columns.find((col) => col.key === key))
+  //   .filter((col): col is Column<T> => col !== undefined);
+
+  const displayedColumns = useMemo(() => {
+    return visibleColumns
+      .map((key) => columns.find((col) => col.key === key))
+      .filter((col): col is Column<T> => col !== undefined);
+  }, [visibleColumns, columns]);
 
   const isBoolean = (value: any): value is boolean =>
     typeof value === "boolean";

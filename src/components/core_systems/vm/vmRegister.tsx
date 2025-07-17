@@ -11,6 +11,7 @@ import UniversalButton from "@/components/ui/universalButton";
 import { ScanSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import FileUploader from "@/components/utility/fileUploader";
 
 export function VmRegister() {
   const { createVm, loading } = useCreateVm();
@@ -140,6 +141,11 @@ export function VmRegister() {
       <h2 className="text-xl font-bold text-center mb-6 text-black dark:text-white">
         Register Virtual Machine
       </h2>
+
+      <div>
+        <FileUploader folder="vm" baseFilename="vm" />
+      </div>
+
       <div className="flex justify-end mb-4">
         <Link href="/core-systems/vm-update">
           <Button variant="default" size="sm" className="text-xs">

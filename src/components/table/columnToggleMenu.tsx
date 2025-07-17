@@ -42,6 +42,7 @@ export function ColumnToggleMenu<T>({
             key={String(col.key)}
             className="capitalize text-[10px]"
             checked={visibleColumns.includes(col.key)}
+            onSelect={(e) => e.preventDefault()} 
             onCheckedChange={(checked) => onToggle(col.key, Boolean(checked))}
           >
             {col.label}
