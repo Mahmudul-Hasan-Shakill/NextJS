@@ -13,9 +13,12 @@ import { DatabaseEdit } from "@/types/database";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ConfirmBulkDeleteDialog } from "@/components/table/confirmBulkDeleteDialog";
+import { useOsIpAddresses } from "@/hooks/core_systems/vm/useOsIpAddresses";
+import { FilePlus2 } from "lucide-react";
 
 export default function DatabaseAction() {
   const { databases, mutate } = useAllDatabases();
+  const { osIpAddresses } = useOsIpAddresses();
   const [viewDatabase, setViewDatabase] = useState<DatabaseEdit | null>(null);
   const [editDatabase, setEditDatabase] = useState<DatabaseEdit | null>(null);
   const [deleteDatabaseTarget, setDeleteDatabaseTarget] =
@@ -64,15 +67,24 @@ export default function DatabaseAction() {
     { key: "dbOwnerEmail", label: "DB Owner Email", type: "text" },
     { key: "remarks", label: "Remarks", type: "textarea" },
     { key: "isActive", label: "Is Active", type: "boolean" },
+    {
+      key: "vmIds",
+      label: "VM IPs",
+      type: "multiselect",
+      options: osIpAddresses.map((vm: any) => ({
+        value: vm.id,
+        label: vm.osIpAddress,
+      })),
+    },
   ];
 
   return (
     <div className="w-full p-4 text-[10px]">
       {/* Header with button */}
       <div className="flex justify-end mb-4">
-        <Link href="/core-systems/database-creation">
+        <Link href="/core-systems/database-server-creation">
           <Button variant="default" size="sm" className="text-xs">
-            + Create Database
+            <FilePlus2 className="h-4 w-4 mr-2"/> Create Database
           </Button>
         </Link>
       </div>

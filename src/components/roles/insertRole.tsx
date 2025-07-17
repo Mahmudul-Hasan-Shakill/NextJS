@@ -14,6 +14,8 @@ import { useGuiNames } from "@/hooks/role/useGuiNames";
 import { useCreateRoles } from "@/hooks/role/useCreateRoles";
 import { useRolesData } from "@/hooks/role/useRolesData";
 import { useUserDetails } from "@/hooks/user/useUserDetails";
+import { ScanSearch } from "lucide-react";
+import Link from "next/link";
 
 // Types
 interface Role {
@@ -109,6 +111,13 @@ const InsertRole: React.FC = () => {
 
   return (
     <div className="space-y-8 p-6">
+      <div className="flex justify-end mb-4">
+        <Link href="/admin-settings/role-update">
+          <Button variant="default" size="sm" className="text-xs">
+            <ScanSearch className="h-4 w-4 mr-2" /> Edit Roles
+          </Button>
+        </Link>
+      </div>
       <Card>
         <CardHeader>
           <h2 className="text-xl font-semibold">Create New Role</h2>

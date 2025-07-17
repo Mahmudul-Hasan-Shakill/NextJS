@@ -41,7 +41,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className={Inter.className}>
-      <head />
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </head>
+
       <body suppressHydrationWarning={true} className="overflow-x-hidden">
         <ThemeProvider
           attribute="class"

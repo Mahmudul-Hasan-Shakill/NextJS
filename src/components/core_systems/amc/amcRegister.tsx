@@ -8,6 +8,9 @@ import { useCreateAmc } from "@/hooks/core_systems/amc/useCreateAmc";
 import { AmcReg } from "@/types/amc";
 import { EditField } from "@/components/table/editFields";
 import UniversalButton from "@/components/ui/universalButton";
+import { Button } from "@/components/ui/button";
+import { ScanSearch } from "lucide-react";
+import Link from "next/link";
 
 export function AmcRegister() {
   const { createAmc, loading } = useCreateAmc();
@@ -25,8 +28,9 @@ export function AmcRegister() {
     "amcEnd",
     "vendorName",
     "oem",
-    "makeBy",
   ];
+
+  const numericFields: (keyof AmcReg)[] = ["quantity"];
 
   const initialState: AmcReg = {
     item: "",
@@ -81,6 +85,14 @@ export function AmcRegister() {
       makeDate: new Date(),
     };
 
+    numericFields.forEach((field) => {
+      const value = formData[field];
+      if (typeof value === "string" && value.trim() !== "") {
+        const parsed = Number(value);
+        (payload as any)[field] = isNaN(parsed) ? undefined : parsed;
+      }
+    });
+
     console.log("AMC Payload:", payload);
 
     const success = await createAmc(payload);
@@ -97,6 +109,13 @@ export function AmcRegister() {
       <h2 className="text-xl font-bold text-center mb-6 text-black dark:text-white">
         Register AMC
       </h2>
+      <div className="flex justify-end mb-4">
+        <Link href="/core-systems/amc-update">
+          <Button variant="default" size="sm" className="text-xs">
+            <ScanSearch className="h-4 w-4 mr-2" /> View AMC List
+          </Button>
+        </Link>
+      </div>
       <div className="my-8 h-[1px] w-full bg-gradient-to-r from-transparent via-neutral-300 to-transparent dark:via-neutral-700" />
 
       <form
@@ -106,14 +125,11 @@ export function AmcRegister() {
         {[
           { name: "item", label: "Item", type: "text" },
           { name: "productName", label: "Product Name", type: "text" },
-          { name: "quantity", label: "Quantity", type: "number" },
-          { name: "eolOrEosl", label: "EOL or EOSL", type: "boolean" },
           {
             name: "declaredEolOrEosl",
             label: "Declared EOL/EOSL",
             type: "date",
           },
-          { name: "underAmc", label: "Under AMC", type: "boolean" },
           { name: "supportType", label: "Support Type", type: "text" },
           { name: "amcStart", label: "AMC Start Date", type: "date" },
           { name: "amcEnd", label: "AMC End Date", type: "date" },
@@ -122,6 +138,9 @@ export function AmcRegister() {
           { name: "vendorName", label: "Vendor Name", type: "text" },
           { name: "oem", label: "OEM", type: "text" },
           { name: "remarks", label: "Remarks", type: "textarea" },
+          { name: "quantity", label: "Quantity", type: "number" },
+          { name: "eolOrEosl", label: "EOL or EOSL", type: "boolean" },
+          { name: "underAmc", label: "Under AMC", type: "boolean" },
           { name: "isActive", label: "Is Active", type: "boolean" },
         ].map(({ name, label, type }) => (
           <EditField

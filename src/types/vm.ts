@@ -2,7 +2,7 @@ export interface VmReg {
   deviceCategory: string;
   hostname: string;
   osIpAddress: string;
-  sshPort: number;
+  sshPort: string;
   osSubnetMask?: string;
   osDefaultGateway?: string;
   serverType?: string;

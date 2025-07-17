@@ -166,16 +166,125 @@ export function EditField({
         </div>
       );
 
+    // case "number":
+    // case "date":
+    // case "email":
+    // case "text":
+    // default:
+    //   return (
+    //     <div className={className}>
+    //       <Label className={className}>{label}</Label>
+    //       <Input
+    //         type={type}
+    //         value={value ?? ""}
+    //         name={name}
+    //         onChange={(e) => {
+    //           const inputValue =
+    //             type === "number" ? Number(e.target.value) : e.target.value;
+    //           onChange({
+    //             target: {
+    //               id: name,
+    //               value: inputValue,
+    //             },
+    //           });
+    //         }}
+    //         className={className}
+    //       />
+    //     </div>
+    //   );
+
     case "number":
+      return (
+        <div className={className}>
+          <Label className={className}>{label}</Label>
+          <Input
+            type="number"
+            value={value ?? ""}
+            name={name}
+            onChange={(e) => {
+              const inputValue =
+                e.target.value === "" ? undefined : Number(e.target.value);
+              onChange({
+                target: {
+                  id: name,
+                  value: inputValue,
+                },
+              });
+            }}
+            className={className}
+          />
+        </div>
+      );
+
     case "date":
+      return (
+        <div className={className}>
+          <Label className={className}>{label}</Label>
+          <Input
+            type="date"
+            value={value ?? ""}
+            name={name}
+            onChange={(e) =>
+              onChange({
+                target: {
+                  id: name,
+                  value: e.target.value,
+                },
+              })
+            }
+            className={className}
+          />
+        </div>
+      );
+
     case "email":
+      return (
+        <div className={className}>
+          <Label className={className}>{label}</Label>
+          <Input
+            type="email"
+            value={value ?? ""}
+            name={name}
+            onChange={(e) =>
+              onChange({
+                target: {
+                  id: name,
+                  value: e.target.value,
+                },
+              })
+            }
+            className={className}
+          />
+        </div>
+      );
+
     case "text":
+      return (
+        <div className={className}>
+          <Label className={className}>{label}</Label>
+          <Input
+            type="text"
+            value={value ?? ""}
+            name={name}
+            onChange={(e) =>
+              onChange({
+                target: {
+                  id: name,
+                  value: e.target.value,
+                },
+              })
+            }
+            className={className}
+          />
+        </div>
+      );
+
     default:
       return (
         <div className={className}>
           <Label className={className}>{label}</Label>
           <Input
-            type={type}
+            type="text"
             value={value ?? ""}
             name={name}
             onChange={(e) =>

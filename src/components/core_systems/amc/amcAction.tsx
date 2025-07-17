@@ -13,6 +13,7 @@ import { AmcEdit } from "@/types/amc";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ConfirmBulkDeleteDialog } from "@/components/table/confirmBulkDeleteDialog";
+import { FilePlus2 } from "lucide-react";
 
 export default function AmcAction() {
   const { amcs, mutate } = useAllAmcs();
@@ -70,7 +71,7 @@ export default function AmcAction() {
       <div className="flex justify-end mb-4">
         <Link href="/core-systems/amc-creation">
           <Button variant="default" size="sm" className="text-xs">
-            + Create AMC
+            <FilePlus2 className="h-4 w-4 mr-2" /> Create AMC
           </Button>
         </Link>
       </div>

@@ -99,4 +99,14 @@ export const roleService = {
     });
     return handleResponse(res);
   },
+
+  // Delete roles by role name
+  async deleteRoleByName(roleName: string) {
+    const res = await fetch(`${baseUrl}roles/name/${roleName}`, {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+      credentials: "include",
+    });
+    return handleResponse(res);
+  },
 };

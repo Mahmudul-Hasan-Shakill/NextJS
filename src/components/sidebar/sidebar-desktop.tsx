@@ -97,13 +97,13 @@ export function SidebarDesktop({ sidebarItems }: SidebarDesktopProps) {
                         <FaUserCircle className="h-4 w-4" />
                       </AvatarFallback>
                     </Avatar>
-                    <span
-                      className="text-[8px] truncate max-w-[100px] inline-block"
-                      title={userName || "Loading..."}
-                    >
-                      {userName || "Loading..."}
-                    </span>
                   </div>
+                  <span
+                    className="text-[8px] truncate max-w-[100px] inline-block"
+                    title={userName || "Loading..."}
+                  >
+                    {userName || "Loading..."}
+                  </span>
                   <MoreHorizontal size={20} />
                 </div>
               </Button>

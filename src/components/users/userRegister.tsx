@@ -15,6 +15,9 @@ import { Select } from "../ui/selects";
 import MailLoader from "../loader/mailLoader";
 import { divisionsData } from "@/types/data";
 import UniversalButton from "../ui/universalButton";
+import { Button } from "../ui/button";
+import { ScanSearch } from "lucide-react";
+import Link from "next/link";
 
 export function UserRegister() {
   const { register, loading } = useRegister();
@@ -111,6 +114,13 @@ export function UserRegister() {
       <h2 className="text-xl font-bold text-center mb-6 text-black dark:text-white">
         Register User
       </h2>
+      <div className="flex justify-end mb-4">
+        <Link href="/admin-settings/user-update">
+          <Button variant="default" size="sm" className="text-xs">
+            <ScanSearch className="h-4 w-4 mr-2" /> View Users
+          </Button>
+        </Link>
+      </div>
       {showAnimation && <MailLoader />}
       <div className="my-8 h-[1px] w-full bg-gradient-to-r from-transparent via-neutral-300 to-transparent dark:via-neutral-700" />
 
@@ -145,86 +155,6 @@ export function UserRegister() {
             />
           </LabelInputContainer>
         </div>
-
-        {/* <div className="mb-4 flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
-          <LabelInputContainer>
-            <Label className="text-xs" htmlFor="email">
-              Email <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              className="text-xs"
-              id="email"
-              placeholder="example@domain.com"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-          </LabelInputContainer>
-          <LabelInputContainer>
-            <Label className="text-xs" htmlFor="division">
-              Division <span className="text-red-500">*</span>
-            </Label>
-            <Select
-              name="division"
-              value={formData.division}
-              onChange={(e) => {
-                const divisionId = parseInt(e.target.value);
-                const selectedDivision = divisionsData.find(
-                  (div) => div.id === divisionId
-                );
-
-                if (selectedDivision) {
-                  setSelectedDivisionId(divisionId);
-                  setSelectedDepartmentId(null);
-                  setFormData((prev) => ({
-                    ...prev,
-                    division: selectedDivision.name,
-                    department: "",
-                    unit: "",
-                  }));
-                }
-              }}
-              options={divisionsData.map((div) => ({
-                value: div.id.toString(),
-                label: div.name,
-              }))}
-              placeholder="-- Select Division --"
-              className="text-[10px]"
-            />
-          </LabelInputContainer>
-        </div> */}
-
-        {/* <div className="mb-4 flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
-          <LabelInputContainer>
-            <Label className="text-xs" htmlFor="division">
-              Division <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              className="text-xs"
-              id="division"
-              placeholder="Division"
-              type="text"
-              value={formData.division}
-              onChange={handleChange}
-              required
-            />
-          </LabelInputContainer>
-          <LabelInputContainer>
-            <Label className="text-xs" htmlFor="department">
-              Department <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              className="text-xs"
-              id="department"
-              placeholder="Department"
-              type="text"
-              value={formData.department}
-              onChange={handleChange}
-              required
-            />
-          </LabelInputContainer>
-        </div> */}
 
         {/* Email and Division */}
         <div className="mb-4 flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">

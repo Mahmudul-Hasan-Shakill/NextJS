@@ -382,7 +382,7 @@ export function DataTable<T extends { id: number | string }>({
                     }}
                   />
                 </td>
-                {displayedColumns.map((col) => (
+                {/* {displayedColumns.map((col) => (
                   <td
                     key={String(col.key)}
                     className="px-3 py-2 text-center align-top break-words whitespace-normal"
@@ -401,7 +401,52 @@ export function DataTable<T extends { id: number | string }>({
                       </div>
                     )}
                   </td>
-                ))}
+                ))} */}
+
+                {displayedColumns.map((col) => {
+                  const cellValue = row[col.key];
+                  return (
+                    <td
+                      key={String(col.key)}
+                      className="px-3 py-2 text-center align-top break-words whitespace-normal"
+                      style={{ wordBreak: "break-word", maxWidth: "200px" }}
+                    >
+                      {isBoolean(cellValue) ? (
+                        <div className="inline-block">
+                          <BooleanBadge
+                            value={cellValue}
+                            type={
+                              col.key as "isActive" | "isLocked" | "isReset"
+                            }
+                          />
+                        </div>
+                      ) : col.type === "multiselect" &&
+                        Array.isArray(cellValue) &&
+                        col.options ? (
+                        <div className="flex flex-wrap gap-0.5 justify-center">
+                          {cellValue.map((id) => {
+                            const label = col.options?.find(
+                              (opt) => opt.value === id
+                            )?.label;
+                            return label ? (
+                              <span
+                                key={id}
+                                className="inline-block bg-blue-100  text-blue-800 text-[8px] font-medium px-2 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-100"
+                              >
+                                {label}
+                              </span>
+                            ) : null;
+                          })}
+                        </div>
+                      ) : (
+                        <div className="inline-block break-words">
+                          {String(cellValue ?? "—")}
+                        </div>
+                      )}
+                    </td>
+                  );
+                })}
+
                 <td
                   style={{ width: "120px" }}
                   className="px-3 py-2 text-center align-top"

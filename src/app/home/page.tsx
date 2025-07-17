@@ -1,8 +1,6 @@
 import React from "react";
 import MainLayout from "@/components/layout/main-layout";
-import { BackgroundLinesDemo } from "@/components/ui/backgroundLines";
-import UserRoleChartsWrapper from "@/components/charts/userRoleChartsWrapper";
-import { Vortex } from "@/components/ui/vortex";
+import VmChartsWrapper from "@/components/charts/userVmChartsWrapper";
 
 export const metadata = {
   title: "Home",
@@ -13,7 +11,7 @@ const Bookmarks: React.FC = () => {
   return (
     <>
       <MainLayout>
-        <UserRoleChartsWrapper />
+        <VmChartsWrapper />
       </MainLayout>
     </>
   );

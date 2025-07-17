@@ -55,7 +55,7 @@ const ChangePassword = () => {
       const result = await changePassword(user.pin, { password: newPassword });
       if (result?.isSuccessful) {
         toast.success(result.message);
-        router.push("/home");
+        router.replace("/home");
       } else {
         toast.error(result?.message);
       }

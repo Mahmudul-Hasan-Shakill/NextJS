@@ -13,6 +13,7 @@ import { VmEdit } from "@/types/vm";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ConfirmBulkDeleteDialog } from "@/components/table/confirmBulkDeleteDialog";
+import { FilePlus2 } from "lucide-react";
 
 export default function VmAction() {
   const { vms, mutate } = useAllVms();
@@ -70,7 +71,7 @@ export default function VmAction() {
     },
     { key: "hostname", label: "Hostname", type: "text" },
     { key: "osIpAddress", label: "OS IP Address", type: "text" },
-    { key: "sshPort", label: "SSH Port", type: "number" },
+    { key: "sshPort", label: "SSH Port", type: "text" },
     { key: "osSubnetMask", label: "OS Subnet Mask", type: "text" },
     { key: "osDefaultGateway", label: "OS Default Gateway", type: "text" },
     { key: "volumeLabel", label: "Volume Label", type: "text" },
@@ -118,7 +119,7 @@ export default function VmAction() {
       <div className="flex justify-end mb-4">
         <Link href="/core-systems/vm-creation">
           <Button variant="default" size="sm" className="text-xs">
-            + Create VM
+            <FilePlus2 className="h-4 w-4 mr-2" /> Create Virtual Machine
           </Button>
         </Link>
       </div>

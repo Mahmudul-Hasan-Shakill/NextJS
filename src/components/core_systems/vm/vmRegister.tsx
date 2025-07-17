@@ -8,6 +8,9 @@ import { useCreateVm } from "@/hooks/core_systems/vm/useCreateVm";
 import { VmReg } from "@/types/vm";
 import { EditField } from "@/components/table/editFields";
 import UniversalButton from "@/components/ui/universalButton";
+import { ScanSearch } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export function VmRegister() {
   const { createVm, loading } = useCreateVm();
@@ -37,7 +40,7 @@ export function VmRegister() {
     deviceCategory: "",
     hostname: "",
     osIpAddress: "",
-    sshPort: 22,
+    sshPort: "",
     osSubnetMask: "",
     osDefaultGateway: "",
     serverType: "",
@@ -111,7 +114,7 @@ export function VmRegister() {
       ...formData,
       makeBy: userName,
       makeDate: new Date(),
-    }; // Convert numeric fields to actual numbers
+    };
 
     numericFields.forEach((field) => {
       const value = formData[field];
@@ -137,6 +140,13 @@ export function VmRegister() {
       <h2 className="text-xl font-bold text-center mb-6 text-black dark:text-white">
         Register Virtual Machine
       </h2>
+      <div className="flex justify-end mb-4">
+        <Link href="/core-systems/vm-update">
+          <Button variant="default" size="sm" className="text-xs">
+            <ScanSearch className="h-4 w-4 mr-2" /> View Virtual Machine
+          </Button>
+        </Link>
+      </div>
       <div className="my-8 h-[1px] w-full bg-gradient-to-r from-transparent via-neutral-300 to-transparent dark:via-neutral-700" />
 
       <form
@@ -190,7 +200,7 @@ export function VmRegister() {
           // { name: "deviceCategory", label: "Device Category", type: "text" },
           { name: "hostname", label: "Hostname", type: "text" },
           { name: "osIpAddress", label: "OS IP Address", type: "text" },
-          { name: "sshPort", label: "SSH Port", type: "number" },
+          { name: "sshPort", label: "SSH Port", type: "text" },
           { name: "osSubnetMask", label: "OS Subnet Mask", type: "text" },
           {
             name: "osDefaultGateway",
@@ -294,4 +304,3 @@ function formatLabel(field: string): string {
     .replace(/([A-Z])/g, " $1")
     .replace(/^./, (str) => str.toUpperCase());
 }
-

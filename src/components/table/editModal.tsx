@@ -223,6 +223,7 @@ export function EditModal<T extends Record<string, any>>({
             const keyStr = String(col.key);
             return (
               <EditField
+              className="text-xs"
                 key={keyStr}
                 label={col.label}
                 type={col.type}

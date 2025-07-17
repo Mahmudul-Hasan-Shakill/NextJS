@@ -5,7 +5,7 @@ import { LoginForm } from "@/components/auth/login";
 
 export default function Home() {
   return (
-    <div className="flex h-screen w-screen">
+    <div className="flex h-screen w-screen overflow-hidden">
       <main className="flex w-full flex-col md:flex-row justify-center">
         {/* Left Side - Hidden on small screens */}
         <div className="hidden md:flex md:w-3/5 bg-white dark:bg-black items-center justify-center">
@@ -55,7 +55,7 @@ export default function Home() {
         </div>
 
         {/* Right Side - Always visible */}
-        <div className="w-full md:w-2/5 bg-white dark:bg-black flex items-center justify-center">
+        <div className="w-full md:w-2/5 lg:w-2/5 bg-white dark:bg-black flex items-center justify-center">
           <div className="w-full max-w-md px-6 py-10 md:mx-12">
             <LoginForm />
           </div>

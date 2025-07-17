@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { useUpdateUserByPin } from "@/hooks/user/useUpdateUserByPin";
 import { toast } from "sonner";
 import { Select } from "@/components/ui/selects";
+import { divisionsData } from "@/types/data";
 
 export default function UserEdit({
   user,
@@ -41,6 +42,24 @@ export default function UserEdit({
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [selectedDivisionId, setSelectedDivisionId] = useState<number | null>(
+    user.division ? parseInt(user.division) : null
+  );
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState<
+    number | null
+  >(user.department ? parseInt(user.department) : null);
+
+  const filteredDepartments =
+    selectedDivisionId != null
+      ? divisionsData.find((div) => div.id === selectedDivisionId)
+          ?.departments || []
+      : [];
+
+  const filteredUnits =
+    selectedDepartmentId != null
+      ? filteredDepartments.find((dep) => dep.id === selectedDepartmentId)
+          ?.units || []
+      : [];
 
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
@@ -91,21 +110,54 @@ export default function UserEdit({
             onChange={(val) => handleChange("email", val)}
             error={errors.email}
           />
-          <Field
+          <DropdownField
+            label="Division"
+            value={selectedDivisionId?.toString() || ""}
+            onChange={(val) => {
+              const id = parseInt(val);
+              setSelectedDivisionId(id);
+              setSelectedDepartmentId(null);
+              setFormData((prev) => ({
+                ...prev,
+                division: val,
+                department: "",
+                unit: "",
+              }));
+            }}
+            options={divisionsData.map((div) => ({
+              value: div.id.toString(),
+              label: div.name,
+            }))}
+          />
+
+          <DropdownField
+            label="Department"
+            value={selectedDepartmentId?.toString() || ""}
+            onChange={(val) => {
+              const id = parseInt(val);
+              setSelectedDepartmentId(id);
+              setFormData((prev) => ({
+                ...prev,
+                department: val,
+                unit: "",
+              }));
+            }}
+            options={filteredDepartments.map((dep) => ({
+              value: dep.id.toString(),
+              label: dep.name,
+            }))}
+          />
+
+          <DropdownField
             label="Unit"
             value={formData.unit}
             onChange={(val) => handleChange("unit", val)}
+            options={filteredUnits.map((unit) => ({
+              value: unit.name,
+              label: unit.name,
+            }))}
           />
-          <Field
-            label="Department"
-            value={formData.department}
-            onChange={(val) => handleChange("department", val)}
-          />
-          <Field
-            label="Division"
-            value={formData.division}
-            onChange={(val) => handleChange("division", val)}
-          />
+
           <Field
             label="Date of Birth"
             value={formData.dob}
@@ -116,8 +168,12 @@ export default function UserEdit({
             label="Marital Status"
             value={formData.marital}
             onChange={(val) => handleChange("marital", val)}
-            options={["Single", "Married"]}
+            options={[
+              { value: "Single", label: "Single" },
+              { value: "Married", label: "Married" },
+            ]}
           />
+
           <Field
             label="NID"
             value={formData.nid}
@@ -175,6 +231,11 @@ function Field({
   );
 }
 
+type DropdownOption = {
+  value: string;
+  label: string;
+};
+
 function DropdownField({
   label,
   value,
@@ -184,18 +245,15 @@ function DropdownField({
   label: string;
   value: string;
   onChange: (val: string) => void;
-  options: string[];
+  options: DropdownOption[];
 }) {
   return (
     <div>
       <Label className="mb-1 block text-xs">{label}</Label>
       <Select
         value={value}
-        onChange={(e) => onChange(e.target.value)} // extract value from simulated event
-        options={options.map((opt) => ({
-          value: opt,
-          label: opt,
-        }))}
+        onChange={(e) => onChange(e.target.value)}
+        options={options}
         placeholder="Select"
         className="w-full text-xs"
       />

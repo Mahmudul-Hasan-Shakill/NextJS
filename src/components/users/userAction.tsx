@@ -17,6 +17,7 @@ import { Button } from "../ui/button";
 import Link from "next/link";
 import { ConfirmApproveDialog } from "../table/confirmApproveDialog";
 import { ConfirmBulkDeleteDialog } from "../table/confirmBulkDeleteDialog";
+import { FilePlus2 } from "lucide-react";
 
 export default function UserAction() {
   const { users, mutate } = useAllUsers();
@@ -111,7 +112,7 @@ export default function UserAction() {
       <div className="flex justify-end mb-4">
         <Link href="/admin-settings/user-creation">
           <Button variant="default" size="sm" className="text-xs">
-            + Create User
+            <FilePlus2 className="h-4 w-4 mr-2" /> Create User
           </Button>
         </Link>
       </div>

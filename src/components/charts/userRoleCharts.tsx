@@ -3,9 +3,7 @@
 import { useAllUsers } from "@/hooks/user/useAllUsers";
 import { PieChartComponent } from "./pieChartComponent";
 import { DonutChartComponent } from "./donutChartComponent";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { BarChartComponent } from "./barChartComponent";
-import { Vortex } from "../ui/vortex";
 export const UserRoleCharts = () => {
   const { users } = useAllUsers();
 

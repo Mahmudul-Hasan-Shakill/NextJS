@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
 import UserEdit from "./userEdit";
+import { divisionsData } from "@/types/data";
 
 export default function UserProfile() {
   const user = useUserByPin();
@@ -21,6 +22,15 @@ export default function UserProfile() {
       </div>
     );
   }
+
+  const divisionName =
+    divisionsData.find((div) => div.id.toString() === user.division)?.name ??
+    "—";
+
+  const departmentName =
+    divisionsData
+      .flatMap((div) => div.departments)
+      .find((dep) => dep.id.toString() === user.department)?.name ?? "—";
 
   return (
     <div className="min-h-screen p-4">
@@ -40,9 +50,10 @@ export default function UserProfile() {
               <ProfileField label="PIN" value={user.pin} />
               <ProfileField label="Name" value={user.name} />
               <ProfileField label="Email" value={user.email} />
+              <ProfileField label="Division" value={divisionName} />
+              <ProfileField label="Department" value={departmentName} />
               <ProfileField label="Unit" value={user.unit ?? "—"} />
-              <ProfileField label="Department" value={user.department ?? "—"} />
-              <ProfileField label="Division" value={user.division ?? "—"} />
+
               <ProfileField
                 label="Date of Birth"
                 value={formatDate(user.dob)}
