@@ -154,11 +154,11 @@ export default function AutomationFileParserUploader({
           onClick={handleParse}
           disabled={parsing || !files}
           className={cn(
-            "group/btn text-xs relative block h-10 w-full rounded-md font-medium text-white shadow transition-all",
+            "mb-4 group/btn text-xs relative block h-10 w-full rounded-md font-medium text-white shadow transition-all",
             parsing
               ? "bg-gray-500 cursor-not-allowed"
               : files
-              ? "bg-gradient-to-br from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600"
+              ? "bg-gradient-to-br from-gray-900 to-gray-600 font-medium text-white shadow dark:bg-zinc-800"
               : "bg-gray-400 cursor-not-allowed"
           )}
         >
