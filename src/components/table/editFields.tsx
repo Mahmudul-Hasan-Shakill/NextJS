@@ -216,13 +216,40 @@ export function EditField({
         </div>
       );
 
+    // case "date":
+    //   return (
+    //     <div className={className}>
+    //       <Label className={className}>{label}</Label>
+    //       <Input
+    //         type="date"
+    //         value={value ?? ""}
+    //         name={name}
+    //         onChange={(e) =>
+    //           onChange({
+    //             target: {
+    //               id: name,
+    //               value: e.target.value,
+    //             },
+    //           })
+    //         }
+    //         className={className}
+    //       />
+    //     </div>
+    //   );
     case "date":
+      const formattedDate =
+        value instanceof Date
+          ? value.toISOString().split("T")[0]
+          : typeof value === "string"
+          ? value.split("T")[0]
+          : "";
+
       return (
         <div className={className}>
           <Label className={className}>{label}</Label>
           <Input
             type="date"
-            value={value ?? ""}
+            value={formattedDate}
             name={name}
             onChange={(e) =>
               onChange({

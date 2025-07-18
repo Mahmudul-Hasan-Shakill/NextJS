@@ -49,4 +49,12 @@ export const projects = [
     title: "Database Server Update",
     link: "/core-systems/database-server-update",
   },
+   {
+    title: "Automatic Server Creation",
+    link: "/core-systems/automatic-server-creation",
+  },
+  {
+    title: "Automatic Server Update",
+    link: "/core-systems/automatic-server-update",
+  },
 ];
