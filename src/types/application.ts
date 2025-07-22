@@ -22,6 +22,7 @@ export interface ApplicationReg {
   editBy?: string;
   editDate?: Date;
   vmIds?: number[];
+  automationIds?: number[];
 }
 
 export interface ApplicationEdit extends ApplicationReg {

@@ -185,8 +185,8 @@ export function AutomationRegister() {
             label: "Falcon Installed",
             type: "select",
             options: [
-              { value: "Yes", label: "Yes" },
-              { value: "No", label: "No" },
+              { value: "Installed", label: "Installed" },
+              { value: "Not installed", label: "Not installed" },
             ],
           },
           {
@@ -194,8 +194,8 @@ export function AutomationRegister() {
             label: "Qualys Installed",
             type: "select",
             options: [
-              { value: "Yes", label: "Yes" },
-              { value: "No", label: "No" },
+              { value: "Installed", label: "Installed" },
+              { value: "Not installed", label: "Not installed" },
             ],
           },
         ].map(({ name, label, type, options }) => (
@@ -242,7 +242,9 @@ export function AutomationRegister() {
           { name: "sshPort", label: "SSH Port", type: "text" },
           { name: "sockets", label: "Sockets", type: "number" },
           { name: "systemUptime", label: "System Uptime", type: "text" },
+          { name: "falconStatus", label: "Falcon Status", type: "text" },
           { name: "falconVersion", label: "Falcon Version", type: "text" },
+          { name: "qualysStatus", label: "Qualys Status", type: "text" },
           { name: "qualysVersion", label: "Qualys Version", type: "text" },
           { name: "diskTotalSize", label: "Disk Total Size", type: "text" },
           { name: "diskUsed", label: "Disk Used", type: "text" },

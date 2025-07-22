@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 interface ParserHookResult {
-  parseFiles: (files: FileList) => Promise<boolean>;
+  parseFiles: (files: FileList) => Promise<any>;
   parsing: boolean;
   result: any;
   error: string | null;
@@ -23,6 +23,7 @@ export default function AutomationFileParserUploader({
 
   const allowedTypes = ["text/plain"];
   const maxFileSizeMB = 2;
+  const maxFileCount = 50;
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -33,8 +34,8 @@ export default function AutomationFileParserUploader({
       allowedTypes.includes(f.type)
     );
 
-    if (!validFiles.length) {
-      toast.error("Only .txt files are allowed");
+    if (validFiles.length > maxFileCount) {
+      toast.error(`You can upload up to ${maxFileCount} files at a time.`);
       return;
     }
 
@@ -62,6 +63,11 @@ export default function AutomationFileParserUploader({
       allowedTypes.includes(f.type)
     );
 
+    if (validFiles.length > maxFileCount) {
+      toast.error(`You can upload up to ${maxFileCount} files at a time.`);
+      return;
+    }
+
     const oversized = validFiles.filter(
       (f) => f.size > maxFileSizeMB * 1024 * 1024
     );
@@ -78,7 +84,6 @@ export default function AutomationFileParserUploader({
     validFiles.forEach((file) => dt.items.add(file));
     setFiles(dt.files);
 
-    // Allow re-uploading the same file
     e.target.value = "";
   };
 
@@ -88,26 +93,24 @@ export default function AutomationFileParserUploader({
       return;
     }
 
-    const success = await parseFiles(files);
-    const parsedCount = result?.data?.length ?? 0;
+    const parsedData = await parseFiles(files);
+    const parsedCount = parsedData?.data?.length ?? 0;
 
-    if (success) {
-      if (parsedCount > 0) {
-        toast.success(
-          `Parsed and saved ${parsedCount} record${parsedCount > 1 ? "s" : ""}.`
-        );
-      } else {
-        toast.warning("No new records parsed (duplicates or invalid).");
-      }
-
-      setFiles(null);
-      const input = document.getElementById(
-        "automation-file-input"
-      ) as HTMLInputElement;
-      if (input) input.value = "";
+    if (parsedData?.isSuccessful && parsedCount > 0) {
+      toast.success(
+        `Parsed and saved ${parsedCount} record${parsedCount > 1 ? "s" : ""}.`
+      );
+    } else if (parsedData?.isSuccessful) {
+      toast.warning("No new records parsed (duplicates or invalid).");
     } else {
       toast.error(error || "Failed to parse files");
     }
+
+    setFiles(null);
+    const input = document.getElementById(
+      "automation-file-input"
+    ) as HTMLInputElement;
+    if (input) input.value = "";
   };
 
   return (

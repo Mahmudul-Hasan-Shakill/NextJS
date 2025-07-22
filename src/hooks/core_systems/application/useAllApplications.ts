@@ -9,6 +9,11 @@ const fetchApplications = async () => {
       ...app,
       vmIds: app.vms?.map((vm: any) => vm.id) ?? [],
       vmIpAddresses: app.vms?.map((vm: any) => vm.osIpAddress) ?? [],
+
+      automationIds:
+        app.automations?.map((automation: any) => automation.id) ?? [],
+      ipAddresses:
+        app.automations?.map((automation: any) => automation.ipAddress) ?? [],
     }));
   }
 
