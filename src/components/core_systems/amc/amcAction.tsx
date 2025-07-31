@@ -1,73 +1,111 @@
 "use client";
 
 import { useState } from "react";
-import { DataTable } from "../../table/dataTable";
-import { Column } from "../../table/dataTable";
-import { ViewModal } from "../../table/modalView";
-import { ConfirmDeleteDialog } from "../../table/confirmDeleteDialog";
-import { EditModal } from "../../table/editModal";
-import { useAllAmcs } from "@/hooks/core_systems/amc/useAllAmcs";
-import { useDeleteAmc } from "@/hooks/core_systems/amc/useDeleteAmc";
-import { useUpdateAmc } from "@/hooks/core_systems/amc/useUpdateAmc";
-import { AmcEdit } from "@/types/amc";
+import { DataTable, Column } from "@/components/table/dataTable";
+import { ViewModal } from "@/components/table/modalView";
+import { ConfirmDeleteDialog } from "@/components/table/confirmDeleteDialog";
+import { EditModal } from "@/components/table/editModal";
+import { ConfirmBulkDeleteDialog } from "@/components/table/confirmBulkDeleteDialog";
+import { useAllAmc } from "@/hooks/core_systems/amc/useAmc";
+import { useDeleteAmc } from "@/hooks/core_systems/amc/useAmc";
+import { useUpdateAmc } from "@/hooks/core_systems/amc/useAmc";
+import { AmcData, AmcUpdatePayload } from "@/types/amc";
+import { useUserDetails } from "@/hooks/user/useUserDetails";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ConfirmBulkDeleteDialog } from "@/components/table/confirmBulkDeleteDialog";
 import { FilePlus2 } from "lucide-react";
+import FileAttachment from "@/components/utility/fileAttachment";
+import { useDocumentUploader } from "@/hooks/utility/useDocument";
 
 export default function AmcAction() {
-  const { amcs, mutate } = useAllAmcs();
-  const [viewAmc, setViewAmc] = useState<AmcEdit | null>(null);
-  const [editAmc, setEditAmc] = useState<AmcEdit | null>(null);
-  const [deleteAmcTarget, setDeleteAmcTarget] = useState<AmcEdit | null>(null);
+  const { amcRecords, mutate } = useAllAmc();
+  const [viewAmc, setViewAmc] = useState<AmcData | null>(null);
+  const [editAmc, setEditAmc] = useState<AmcData | null>(null);
+  const [deleteAmcTarget, setDeleteAmcTarget] = useState<AmcData | null>(null);
+  const [bulkDeleteIds, setBulkDeleteIds] = useState<(number | string)[]>([]);
+  const [resetSelectionKey, setResetSelectionKey] = useState(0);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
   const { deleteAmc } = useDeleteAmc();
   const { updateAmc } = useUpdateAmc();
-  const [bulkDeleteIds, setBulkDeleteIds] = useState<(number | string)[]>([]);
+  const { uploadDocument } = useDocumentUploader();
+  const userName = useUserDetails();
 
-  const handleDeleteAmc = async (amc: AmcEdit) => {
-    try {
-      await deleteAmc(amc.id);
-      setDeleteAmcTarget(null);
-      setViewAmc(null);
-      mutate();
-    } catch (error) {}
+  const handleDeleteAmc = async (amc: AmcData) => {
+    await deleteAmc(amc.id);
+    setDeleteAmcTarget(null);
+    setViewAmc(null);
+    mutate();
   };
 
-  const handleUpdateAmc = async (updated: AmcEdit) => {
-    try {
-      const editableKeys = columns.map((col) => col.key);
-      const payload = Object.fromEntries(
-        Object.entries(updated).filter(([key]) =>
-          editableKeys.includes(key as keyof AmcEdit)
-        )
-      );
-      await updateAmc(updated.id, payload);
-      setEditAmc(null);
-      mutate();
-    } catch (error) {}
+  const handleUpdateAmc = async (updated: AmcData, newFiles: File[]) => {
+    const editableKeys = columns.map((col) => col.key);
+    const payload: AmcUpdatePayload = Object.fromEntries(
+      Object.entries(updated).filter(([key]) =>
+        editableKeys.includes(key as keyof AmcUpdatePayload)
+      )
+    );
+
+    const finalPayload: AmcUpdatePayload = {
+      ...payload,
+      editBy: userName,
+      documents: updated.documents?.map((doc) => ({
+        id: doc.id,
+        fileName: doc.fileName,
+        storedFilePath: doc.downloadUrl,
+        relatedType: doc.relatedType,
+        relatedId: doc.relatedId,
+        mimeType: doc.mimeType,
+        size: doc.size,
+        uploadedBy: doc.uploadedBy,
+        description: doc.description,
+      })),
+      documentIdsToRemove: updated.documentIdsToRemove ?? [],
+    };
+
+    const success = await updateAmc(updated.id, finalPayload);
+
+    if (success && newFiles.length > 0) {
+      for (const file of newFiles) {
+        await uploadDocument("amc", updated.id, file, {
+          uploadedBy: userName,
+          description: `${userName} uploaded the file.`,
+        });
+      }
+    }
+
+    setEditAmc(null);
+    setSelectedFiles([]);
+    mutate();
   };
 
-  const columns: Column<AmcEdit>[] = [
-    { key: "item", label: "Item", type: "text" },
+  const columns: Column<AmcData>[] = [
     { key: "productName", label: "Product Name", type: "text" },
     { key: "quantity", label: "Quantity", type: "number" },
-    { key: "eolOrEosl", label: "EOL/EOSL", type: "boolean" },
-    { key: "declaredEolOrEosl", label: "Declared EOL/EOSL", type: "date" },
-    { key: "underAmc", label: "Under AMC", type: "boolean" },
+    { key: "serialNumber", label: "Serial Number", type: "text" },
+    { key: "assetTag", label: "Asset Tag", type: "text" },
+    { key: "isEolOrEosl", label: "Is EOL/EOSL?", type: "boolean" },
+    { key: "declaredEolOrEosl", label: "Declared EOL/EOSL Date", type: "date" },
+    { key: "underAmc", label: "Under AMC?", type: "boolean" },
     { key: "supportType", label: "Support Type", type: "text" },
-    { key: "amcStart", label: "AMC Start", type: "date" },
-    { key: "amcEnd", label: "AMC End", type: "date" },
-    { key: "warrantyStart", label: "Warranty Start", type: "date" },
-    { key: "warrantyEnd", label: "Warranty End", type: "date" },
-    { key: "vendorName", label: "Vendor Name", type: "text" },
+    { key: "amcStart", label: "AMC Start Date", type: "date" },
+    { key: "amcEnd", label: "AMC End Date", type: "date" },
+    { key: "warrantyStart", label: "Warranty Start Date", type: "date" },
+    { key: "warrantyEnd", label: "Warranty End Date", type: "date" },
+    { key: "vendorName", label: "Vendor", type: "text" },
     { key: "oem", label: "OEM", type: "text" },
-    { key: "remarks", label: "Remarks", type: "textarea" },
+    { key: "purchaseDate", label: "Purchase Date", type: "date" },
+    { key: "purchaseOrderNumber", label: "Purchase Order Number", type: "text" },
+    { key: "location", label: "Location", type: "text" },
+    { key: "status", label: "Status", type: "text" },
+    { key: "remarks", label: "Remarks", type: "text" },
     { key: "isActive", label: "Is Active", type: "boolean" },
+    { key: "documents", label: "Attachments", type: "href" },
   ];
 
   return (
     <div className="w-full p-4 text-[10px]">
-      {/* Header with button */}
+      {/* Header */}
       <div className="flex justify-end mb-4">
         <Link href="/core-systems/amc-creation">
           <Button variant="default" size="sm" className="text-xs">
@@ -75,16 +113,20 @@ export default function AmcAction() {
           </Button>
         </Link>
       </div>
-      {/* Data Table */}
+
+      {/* Table */}
       <DataTable
+        key={resetSelectionKey}
         columns={columns}
-        data={amcs}
+        data={amcRecords}
         tableName="amc_list"
         onView={(amc) => setViewAmc(amc)}
         onEdit={(amc) => setEditAmc(amc)}
         onDelete={(amc) => setDeleteAmcTarget(amc)}
         onBulkDelete={(ids) => setBulkDeleteIds(ids)}
       />
+
+      {/* View Modal */}
       {viewAmc && (
         <ViewModal
           row={viewAmc}
@@ -92,15 +134,23 @@ export default function AmcAction() {
           onClose={() => setViewAmc(null)}
         />
       )}
+
+      {/* Edit Modal with FileAttachment */}
       {editAmc && (
         <EditModal
           row={editAmc}
           columns={columns}
           open={!!editAmc}
           onClose={() => setEditAmc(null)}
-          onSubmit={handleUpdateAmc}
-        />
+          onSubmit={(updatedRow) => handleUpdateAmc(updatedRow, selectedFiles)}
+        >
+          <FileAttachment
+            onFilesSelected={(files) => setSelectedFiles(files)}
+          />
+        </EditModal>
       )}
+
+      {/* Delete Dialog */}
       {deleteAmcTarget && (
         <ConfirmDeleteDialog
           row={deleteAmcTarget}
@@ -109,19 +159,18 @@ export default function AmcAction() {
           onConfirm={handleDeleteAmc}
         />
       )}
+
+      {/* Bulk Delete Dialog */}
       {bulkDeleteIds.length > 0 && (
         <ConfirmBulkDeleteDialog
           ids={bulkDeleteIds}
           open={bulkDeleteIds.length > 0}
           onClose={() => setBulkDeleteIds([])}
           onConfirm={async (ids) => {
-            try {
-              await Promise.all(ids.map((id) => deleteAmc(Number(id))));
-              setBulkDeleteIds([]);
-              mutate();
-            } catch (error) {
-              console.error("Bulk delete failed:", error);
-            }
+            await Promise.all(ids.map((id) => deleteAmc(Number(id))));
+            setBulkDeleteIds([]);
+            setResetSelectionKey((prev) => prev + 1);
+            mutate();
           }}
         />
       )}

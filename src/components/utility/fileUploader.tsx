@@ -7,6 +7,7 @@ interface FileUploaderProps {
   folder: string;
   baseFilename: string;
   maxFileSizeMB?: number;
+  onUploadComplete?: (paths: string[]) => void;
 }
 
 const allowedTypes = [
@@ -26,6 +27,7 @@ export default function FileUploader({
   folder,
   baseFilename,
   maxFileSizeMB = 5,
+  onUploadComplete,
 }: FileUploaderProps) {
   const [dragOver, setDragOver] = useState(false);
   const [files, setFiles] = useState<FileList | null>(null);
@@ -98,12 +100,14 @@ export default function FileUploader({
     }
   };
 
-  const { uploadFiles, uploading, progress, error } = useFileUploader();
+  const { uploadFiles, uploading, progress, error, uploadedPaths } =
+    useFileUploader();
 
   const handleUpload = async () => {
     if (files) {
       const success = await uploadFiles(files, folder, baseFilename);
       if (success) {
+        onUploadComplete?.(uploadedPaths);
         setFiles(null);
         const input = document.getElementById(
           `file-input-${folder}`

@@ -23,6 +23,7 @@ type EditFieldProps = {
   name: string;
   onChange: (e: SyntheticChangeEvent | React.ChangeEvent<any>) => void;
   className?: string;
+  checked?: boolean;
 };
 
 export function EditField({
@@ -166,32 +167,20 @@ export function EditField({
         </div>
       );
 
-    // case "number":
-    // case "date":
-    // case "email":
-    // case "text":
-    // default:
-    //   return (
-    //     <div className={className}>
-    //       <Label className={className}>{label}</Label>
-    //       <Input
-    //         type={type}
-    //         value={value ?? ""}
-    //         name={name}
-    //         onChange={(e) => {
-    //           const inputValue =
-    //             type === "number" ? Number(e.target.value) : e.target.value;
-    //           onChange({
-    //             target: {
-    //               id: name,
-    //               value: inputValue,
-    //             },
-    //           });
-    //         }}
-    //         className={className}
-    //       />
-    //     </div>
-    //   );
+    case "href":
+      return (
+        <div className={className}>
+          <Label className={className}>{label}</Label>
+          <a
+            href={value}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline break-all"
+          >
+            {value}
+          </a>
+        </div>
+      );
 
     case "number":
       return (
@@ -216,26 +205,6 @@ export function EditField({
         </div>
       );
 
-    // case "date":
-    //   return (
-    //     <div className={className}>
-    //       <Label className={className}>{label}</Label>
-    //       <Input
-    //         type="date"
-    //         value={value ?? ""}
-    //         name={name}
-    //         onChange={(e) =>
-    //           onChange({
-    //             target: {
-    //               id: name,
-    //               value: e.target.value,
-    //             },
-    //           })
-    //         }
-    //         className={className}
-    //       />
-    //     </div>
-    //   );
     case "date":
       const formattedDate =
         value instanceof Date

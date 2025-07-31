@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { FileDown, FileSpreadsheet } from "lucide-react";
+import { FileSpreadsheet } from "lucide-react";
 
 type ExportCsvButtonProps<T> = {
   data: T[];
@@ -17,7 +17,18 @@ export function ExportCsvButton<T>({
   const handleExport = () => {
     const headers = columns.map((col) => col.label);
     const rows = data.map((row) =>
-      columns.map((col) => String(row[col.key] ?? ""))
+      columns.map((col) => {
+        const value = row[col.key];
+
+        // Handle attachments (documents)
+        if (Array.isArray(value) && value.length > 0 && value[0]?.downloadUrl) {
+          return value
+            .map((doc: any) => `${doc.fileName} (${doc.downloadUrl})`)
+            .join(" | ");
+        }
+
+        return String(value ?? "");
+      })
     );
 
     const csvContent = [headers, ...rows].map((r) => r.join(",")).join("\n");

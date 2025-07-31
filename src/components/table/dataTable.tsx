@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback } from "react";
+import React, { JSX, useCallback } from "react";
 import { useState, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { ColumnToggleMenu } from "./columnToggleMenu";
@@ -16,6 +16,13 @@ import { useDebounce } from "use-debounce";
 import { BulkActions } from "./bulkActionBar";
 import { ColumnReordering } from "./columnReordering";
 import { GripVertical } from "lucide-react";
+import { DocumentData } from "@/types/document";
+
+import {
+  ContextMenu,
+  ContextMenuTrigger,
+  ContextMenuContent,
+} from "@/components/ui/context-menu";
 
 export type Column<T> = {
   key: keyof T;
@@ -30,9 +37,11 @@ export type Column<T> = {
     | "email"
     | "textarea"
     | "radio"
-    | "checkbox";
+    | "checkbox"
+    | "href";
   options?: { label: string; value: any }[];
   fetchOptions?: () => Promise<{ label: string; value: any }[]>;
+  render?: (row: T) => JSX.Element;
 };
 
 type DataTableProps<T> = {
@@ -263,7 +272,7 @@ export function DataTable<T extends { id: number | string }>({
               handleDragEnd,
               handleDrop,
             }) => (
-              <thead className="bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 text-[10px]">
+              <thead className="bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 text-[12px]">
                 <tr>
                   <th
                     style={{ width: "40px" }}
@@ -364,8 +373,7 @@ export function DataTable<T extends { id: number | string }>({
               </thead>
             )}
           </ColumnReordering>
-
-          <tbody className="text-[8px]">
+          {/* <tbody className="text-[10px]">
             {paginatedData.map((row) => (
               <tr
                 key={row.id}
@@ -388,36 +396,33 @@ export function DataTable<T extends { id: number | string }>({
                     }}
                   />
                 </td>
-                {/* {displayedColumns.map((col) => (
-                  <td
-                    key={String(col.key)}
-                    className="px-3 py-2 text-center align-top break-words whitespace-normal"
-                    style={{ wordBreak: "break-word", maxWidth: "200px" }}
-                  >
-                    {isBoolean(row[col.key]) ? (
-                      <div className="inline-block">
-                        <BooleanBadge
-                          value={row[col.key] as boolean}
-                          type={col.key as "isActive" | "isLocked" | "isReset"}
-                        />
-                      </div>
-                    ) : (
-                      <div className="inline-block break-words">
-                        {String(row[col.key])}
-                      </div>
-                    )}
-                  </td>
-                ))} */}
 
                 {displayedColumns.map((col) => {
                   const cellValue = row[col.key];
+
                   return (
                     <td
                       key={String(col.key)}
-                      className="px-3 py-2 text-center align-top break-words whitespace-normal"
+                      className="px-3 text-center align-center break-words whitespace-normal leading-tight"
                       style={{ wordBreak: "break-word", maxWidth: "200px" }}
                     >
-                      {isBoolean(cellValue) ? (
+                      {col.render ? (
+                        col.render(row)
+                      ) : col.type === "href" && Array.isArray(cellValue) ? (
+                        <div className="flex flex-col items-center gap-1">
+                          {cellValue.map((doc: DocumentData) => (
+                            <a
+                              key={doc.id}
+                              href={doc.downloadUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 underline text-[10px]"
+                            >
+                              {doc.fileName}
+                            </a>
+                          ))}
+                        </div>
+                      ) : isBoolean(cellValue) ? (
                         <div className="inline-block">
                           <BooleanBadge
                             value={cellValue}
@@ -437,7 +442,7 @@ export function DataTable<T extends { id: number | string }>({
                             return label ? (
                               <span
                                 key={id}
-                                className="inline-block bg-blue-100  text-blue-800 text-[8px] font-medium px-2 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-100"
+                                className="inline-block bg-blue-100 text-blue-800 text-[8px] font-medium px-2 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-100"
                               >
                                 {label}
                               </span>
@@ -455,7 +460,7 @@ export function DataTable<T extends { id: number | string }>({
 
                 <td
                   style={{ width: "120px" }}
-                  className="px-3 py-2 text-center align-top"
+                  className="px-3 py-0.5 text-center align-top"
                 >
                   <RowActionsMenu
                     row={row}
@@ -472,6 +477,135 @@ export function DataTable<T extends { id: number | string }>({
                   />
                 </td>
               </tr>
+            ))}
+          </tbody> */}
+
+          <tbody className="text-[10px]">
+            {paginatedData.map((row) => (
+              <ContextMenu key={row.id}>
+                <ContextMenuTrigger asChild>
+                  <tr
+                    className={`hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-200 dark:border-gray-700 ${
+                      selectedRowIds.includes(row.id)
+                        ? "bg-blue-50 dark:bg-blue-900"
+                        : ""
+                    }`}
+                  >
+                    <td className="p-1 text-center">
+                      <input
+                        type="checkbox"
+                        checked={selectedRowIds.includes(row.id)}
+                        onChange={(e) => {
+                          setSelectedRowIds((prev) =>
+                            e.target.checked
+                              ? [...prev, row.id]
+                              : prev.filter((id) => id !== row.id)
+                          );
+                        }}
+                      />
+                    </td>
+
+                    {displayedColumns.map((col) => {
+                      const cellValue = row[col.key];
+
+                      return (
+                        <td
+                          key={String(col.key)}
+                          className="px-3 text-center align-center break-words whitespace-normal leading-tight"
+                          style={{ wordBreak: "break-word", maxWidth: "200px" }}
+                        >
+                          {col.render ? (
+                            col.render(row)
+                          ) : col.type === "href" &&
+                            Array.isArray(cellValue) ? (
+                            <div className="flex flex-col items-center gap-1">
+                              {cellValue.map((doc: DocumentData) => (
+                                <a
+                                  key={doc.id}
+                                  href={doc.downloadUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 underline text-[10px]"
+                                >
+                                  {doc.fileName}
+                                </a>
+                              ))}
+                            </div>
+                          ) : isBoolean(cellValue) ? (
+                            <div className="inline-block">
+                              <BooleanBadge
+                                value={cellValue}
+                                type={
+                                  col.key as "isActive" | "isLocked" | "isReset"
+                                }
+                              />
+                            </div>
+                          ) : col.type === "multiselect" &&
+                            Array.isArray(cellValue) &&
+                            col.options ? (
+                            <div className="flex flex-wrap gap-0.5 justify-center">
+                              {cellValue.map((id) => {
+                                const label = col.options?.find(
+                                  (opt) => opt.value === id
+                                )?.label;
+                                return label ? (
+                                  <span
+                                    key={id}
+                                    className="inline-block bg-blue-100 text-blue-800 text-[8px] font-medium px-2 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-100"
+                                  >
+                                    {label}
+                                  </span>
+                                ) : null;
+                              })}
+                            </div>
+                          ) : (
+                            <div className="inline-block break-words">
+                              {String(cellValue ?? "—")}
+                            </div>
+                          )}
+                        </td>
+                      );
+                    })}
+
+                    <td
+                      style={{ width: "120px" }}
+                      className="px-3 py-0.5 text-center align-top"
+                    >
+                      <RowActionsMenu
+                        row={row}
+                        onView={onView}
+                        onApprove={onApprove}
+                        onReset={onReset}
+                        onEdit={onEdit}
+                        onDelete={onDelete}
+                        showView={showView}
+                        showApprove={showApprove}
+                        showReset={showReset}
+                        showEdit={showEdit}
+                        showDelete={showDelete}
+                        variant="dropdown"
+                      />
+                    </td>
+                  </tr>
+                </ContextMenuTrigger>
+
+                <ContextMenuContent className="w-[40px] z-50">
+                  <RowActionsMenu
+                    row={row}
+                    onView={onView}
+                    onApprove={onApprove}
+                    onReset={onReset}
+                    onEdit={onEdit}
+                    onDelete={onDelete}
+                    showView={showView}
+                    showApprove={showApprove}
+                    showReset={showReset}
+                    showEdit={showEdit}
+                    showDelete={showDelete}
+                    variant="context"
+                  />
+                </ContextMenuContent>
+              </ContextMenu>
             ))}
           </tbody>
         </table>
