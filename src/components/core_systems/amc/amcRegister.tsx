@@ -1,108 +1,114 @@
 "use client";
 
 import React, { useState } from "react";
-import DataLoader from "@/components/loader/dataLoader";
+import DataLoader from "../../loader/dataLoader";
 import { toast } from "sonner";
 import { useUserDetails } from "@/hooks/user/useUserDetails";
-import { useCreateAmc } from "@/hooks/core_systems/amc/useAmc";
-import { useDocumentUploader } from "@/hooks/utility/useDocument";
-import { AmcCreatePayload } from "@/types/amc";
+import { useCreateAmc } from "@/hooks/core_systems/amc/useCreateAmc";
+import { AmcReg } from "@/types/amc";
 import { EditField } from "@/components/table/editFields";
 import UniversalButton from "@/components/ui/universalButton";
-import FileAttachment from "@/components/utility/fileAttachment";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ScanSearch } from "lucide-react";
+import Link from "next/link";
 
 export function AmcRegister() {
-  const { createAmc, loading: createLoading } = useCreateAmc();
-  const { uploadDocument } = useDocumentUploader();
+  const { createAmc, loading } = useCreateAmc();
   const userName = useUserDetails();
 
-  const requiredFields: (keyof AmcCreatePayload)[] = [
+  const requiredFields: (keyof AmcReg)[] = [
+    "item",
     "productName",
     "quantity",
-    "status",
+    "eolOrEosl",
+    "declaredEolOrEosl",
+    "underAmc",
+    "supportType",
+    "amcStart",
+    "amcEnd",
+    "vendorName",
+    "oem",
   ];
 
-  const initialState: AmcCreatePayload = {
+  const numericFields: (keyof AmcReg)[] = ["quantity"];
+
+  const initialState: AmcReg = {
+    item: "",
     productName: "",
-    quantity: 1,
-    status: "Active",
-    isEolOrEosl: false,
+    quantity: 0,
+    eolOrEosl: false,
+    declaredEolOrEosl: new Date(),
     underAmc: false,
-    makeBy: "",
+    supportType: "",
+    amcStart: new Date(),
+    amcEnd: new Date(),
+    warrantyStart: new Date(),
+    warrantyEnd: new Date(),
+    vendorName: "",
+    oem: "",
+    remarks: "",
+    isActive: true,
+    makeBy: userName,
+    makeDate: undefined,
+    editBy: "",
+    editDate: undefined,
   };
 
-  const [formData, setFormData] = useState<AmcCreatePayload>(initialState);
-  const [amcFiles, setAmcFiles] = useState<File[]>([]);
+  const [formData, setFormData] = useState<AmcReg>(initialState);
 
   const handleChange = (
-    e:
-      | React.ChangeEvent<any>
-      | { target: { id: string; value: any; type?: string } }
+    e: React.ChangeEvent<any> | { target: { id: string; value: any } }
   ) => {
-    const { id, value, type } = e.target;
-    const processedValue =
-      type === "checkbox" || type === "boolean" ? Boolean(value) : value;
-    setFormData((prev) => ({ ...prev, [id]: processedValue }));
-  };
-
-  const handleFilesSelected = (files: File[]) => {
-    setAmcFiles(files);
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const missingFields = requiredFields.filter(
-      (field) =>
-        formData[field] === undefined ||
-        formData[field] === "" ||
-        formData[field] === null
+      (field) => formData[field] === undefined || formData[field] === ""
     );
 
     if (missingFields.length > 0) {
       toast.warning(
-        `Please fill in all required fields: ${missingFields.join(", ")}.`
+        `Please fill in all required fields: ${missingFields
+          .map((f) => formatLabel(f))
+          .join(", ")}`
       );
       return;
     }
 
-    const payload: AmcCreatePayload = {
+    const payload: AmcReg = {
       ...formData,
       makeBy: userName,
+      makeDate: new Date(),
     };
 
-    const response = await createAmc(payload);
-
-    if (response?.id && amcFiles.length > 0) {
-      // for (const file of amcFiles) {
-      //   await uploadDocument("amc", response.id, file);
-      // }
-      for (const file of amcFiles) {
-        await uploadDocument("amc", response.id, file, {
-          uploadedBy: userName,
-          description: `${userName} uploaded the file.`,
-        });
+    numericFields.forEach((field) => {
+      const value = formData[field];
+      if (typeof value === "string" && value.trim() !== "") {
+        const parsed = Number(value);
+        (payload as any)[field] = isNaN(parsed) ? undefined : parsed;
       }
-    }
+    });
 
-    if (response?.id) {
-      toast.success("AMC and documents submitted successfully.");
+    console.log("AMC Payload:", payload);
+
+    const success = await createAmc(payload);
+
+    if (success) {
       setFormData(initialState);
-      setAmcFiles([]);
     }
   };
 
-  if (createLoading) return <DataLoader />;
+  if (loading) return <DataLoader />;
 
   return (
     <div className="mx-auto w-full max-w-5xl bg-white p-6 rounded-lg shadow-md dark:bg-black text-[10px]">
       <h2 className="text-xl font-bold text-center mb-6 text-black dark:text-white">
-        Register AMC Record
+        Register AMC
       </h2>
-
       <div className="flex justify-end mb-4">
         <Link href="/core-systems/amc-update">
           <Button variant="default" size="sm" className="text-xs">
@@ -110,182 +116,61 @@ export function AmcRegister() {
           </Button>
         </Link>
       </div>
-
       <div className="my-8 h-[1px] w-full bg-gradient-to-r from-transparent via-neutral-300 to-transparent dark:via-neutral-700" />
 
       <form
         onSubmit={handleSubmit}
         className="grid grid-cols-1 md:grid-cols-2 gap-4 text-[10px]"
       >
-        <EditField
-          name="productName"
-          label="Product Name *"
-          type="text"
-          value={formData.productName}
-          onChange={handleChange}
-          className="text-[10px]"
-        />
-        <EditField
-          name="quantity"
-          label="Quantity *"
-          type="number"
-          value={formData.quantity}
-          onChange={handleChange}
-          className="text-[10px]"
-        />
-        <EditField
-          name="serialNumber"
-          label="Serial Number"
-          type="text"
-          value={formData.serialNumber}
-          onChange={handleChange}
-          className="text-[10px]"
-        />
-        <EditField
-          name="assetTag"
-          label="Asset Tag"
-          type="text"
-          value={formData.assetTag}
-          onChange={handleChange}
-          className="text-[10px]"
-        />
-        <EditField
-          name="isEolOrEosl"
-          label="Is EOL/EOSL?"
-          type="boolean"
-          value={formData.isEolOrEosl}
-          onChange={handleChange}
-          className="text-[10px]"
-        />
-        {formData.isEolOrEosl && (
+        {[
+          { name: "item", label: "Item", type: "text" },
+          { name: "productName", label: "Product Name", type: "text" },
+          {
+            name: "declaredEolOrEosl",
+            label: "Declared EOL/EOSL",
+            type: "date",
+          },
+          { name: "supportType", label: "Support Type", type: "text" },
+          { name: "amcStart", label: "AMC Start Date", type: "date" },
+          { name: "amcEnd", label: "AMC End Date", type: "date" },
+          { name: "warrantyStart", label: "Warranty Start Date", type: "date" },
+          { name: "warrantyEnd", label: "Warranty End Date", type: "date" },
+          { name: "vendorName", label: "Vendor Name", type: "text" },
+          { name: "oem", label: "OEM", type: "text" },
+          { name: "remarks", label: "Remarks", type: "textarea" },
+          { name: "quantity", label: "Quantity", type: "number" },
+          { name: "eolOrEosl", label: "EOL or EOSL", type: "boolean" },
+          { name: "underAmc", label: "Under AMC", type: "boolean" },
+          { name: "isActive", label: "Is Active", type: "boolean" },
+        ].map(({ name, label, type }) => (
           <EditField
-            name="declaredEolOrEosl"
-            label="Declared EOL/EOSL Date"
-            type="date"
-            value={formData.declaredEolOrEosl}
+            key={name}
+            name={name}
+            label={
+              requiredFields.includes(name as keyof AmcReg) ? (
+                <>
+                  {label} <span className="text-red-500">*</span>
+                </>
+              ) : (
+                label
+              )
+            }
+            type={type}
+            value={formData[name as keyof AmcReg]}
             onChange={handleChange}
             className="text-[10px]"
           />
-        )}
-        <EditField
-          name="underAmc"
-          label="Under AMC?"
-          type="boolean"
-          value={formData.underAmc}
-          onChange={handleChange}
-          className="text-[10px]"
-        />
-        {formData.underAmc && (
-          <>
-            <EditField
-              name="supportType"
-              label="Support Type"
-              type="text"
-              value={formData.supportType}
-              onChange={handleChange}
-              className="text-[10px]"
-            />
-            <EditField
-              name="amcStart"
-              label="AMC Start Date"
-              type="date"
-              value={formData.amcStart}
-              onChange={handleChange}
-              className="text-[10px]"
-            />
-            <EditField
-              name="amcEnd"
-              label="AMC End Date"
-              type="date"
-              value={formData.amcEnd}
-              onChange={handleChange}
-              className="text-[10px]"
-            />
-          </>
-        )}
-        <EditField
-          name="warrantyStart"
-          label="Warranty Start Date"
-          type="date"
-          value={formData.warrantyStart}
-          onChange={handleChange}
-          className="text-[10px]"
-        />
-        <EditField
-          name="warrantyEnd"
-          label="Warranty End Date"
-          type="date"
-          value={formData.warrantyEnd}
-          onChange={handleChange}
-          className="text-[10px]"
-        />
-        <EditField
-          name="vendorName"
-          label="Vendor Name"
-          type="text"
-          value={formData.vendorName}
-          onChange={handleChange}
-          className="text-[10px]"
-        />
-        <EditField
-          name="oem"
-          label="OEM"
-          type="text"
-          value={formData.oem}
-          onChange={handleChange}
-          className="text-[10px]"
-        />
-        <EditField
-          name="purchaseDate"
-          label="Purchase Date"
-          type="date"
-          value={formData.purchaseDate}
-          onChange={handleChange}
-          className="text-[10px]"
-        />
-        <EditField
-          name="purchaseOrderNumber"
-          label="Purchase Order Number"
-          type="text"
-          value={formData.purchaseOrderNumber}
-          onChange={handleChange}
-          className="text-[10px]"
-        />
-        <EditField
-          name="location"
-          label="Location"
-          type="text"
-          value={formData.location}
-          onChange={handleChange}
-          className="text-[10px]"
-        />
-        <EditField
-          name="status"
-          label="Status *"
-          type="text"
-          value={formData.status}
-          onChange={handleChange}
-          className="text-[10px]"
-        />
+        ))}
         <div className="col-span-1 md:col-span-2">
-          <EditField
-            name="remarks"
-            label="Remarks"
-            type="textarea"
-            value={formData.remarks}
-            onChange={handleChange}
-            className="text-[10px]"
-          />
-        </div>
-
-        <div className="col-span-1 md:col-span-2 text-[10px]">
-          <FileAttachment onFilesSelected={handleFilesSelected} />
-        </div>
-
-        <div className="col-span-1 md:col-span-2">
-          <UniversalButton type="submit">Create AMC Record →</UniversalButton>
+          <UniversalButton type="submit">Submit &rarr;</UniversalButton>
         </div>
       </form>
     </div>
   );
+}
+
+function formatLabel(field: string): string {
+  return field
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, (str) => str.toUpperCase());
 }

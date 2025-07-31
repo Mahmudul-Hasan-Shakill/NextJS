@@ -35,7 +35,7 @@ export function ColumnToggleMenu<T>({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[180px]">
-        <DropdownMenuLabel className="text-[10px]">Select columns to view</DropdownMenuLabel>
+        <DropdownMenuLabel className="text-[10px]">Toggle columns</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {allColumns.map((col) => (
           <DropdownMenuCheckboxItem

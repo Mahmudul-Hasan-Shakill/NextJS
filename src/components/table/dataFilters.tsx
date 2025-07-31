@@ -38,6 +38,7 @@ export function DataFilter<T extends object>({
     );
   }, [uniqueValues, search]);
 
+
   const isAllSelected =
     uniqueValues.length > 0 && selectedFilters.length === uniqueValues.length;
 

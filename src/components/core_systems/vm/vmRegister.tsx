@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import DataLoader from "../../loader/dataLoader";
 import { toast } from "sonner";
 import { useUserDetails } from "@/hooks/user/useUserDetails";
 import { useCreateVm } from "@/hooks/core_systems/vm/useCreateVm";
@@ -11,21 +12,10 @@ import { ScanSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import FileUploader from "@/components/utility/fileUploader";
-import InputPageLoader from "@/components/loader/inputLoader";
 
 export function VmRegister() {
   const { createVm, loading } = useCreateVm();
   const userName = useUserDetails();
-
-  const [showLoader, setShowLoader] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowLoader(false);
-    }, 1000); // 1 second delay
-
-    return () => clearTimeout(timer);
-  }, []);
 
   const requiredFields: (keyof VmReg)[] = [
     "deviceCategory",
@@ -144,7 +134,7 @@ export function VmRegister() {
     }
   };
 
-  if (loading || showLoader) return <InputPageLoader />;
+  if (loading) return <DataLoader />;
 
   return (
     <div className="mx-auto w-full max-w-5xl bg-white p-6 rounded-lg shadow-md dark:bg-black text-[10px]">
@@ -152,9 +142,9 @@ export function VmRegister() {
         Register Virtual Machine
       </h2>
 
-      {/* <div>
+      <div>
         <FileUploader folder="vm" baseFilename="vm" />
-      </div> */}
+      </div>
 
       <div className="flex justify-end mb-4">
         <Link href="/core-systems/vm-update">

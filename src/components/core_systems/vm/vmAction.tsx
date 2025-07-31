@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { DataTable } from "../../table/dataTable";
 import { Column } from "../../table/dataTable";
 import { ViewModal } from "../../table/modalView";
@@ -14,7 +14,6 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ConfirmBulkDeleteDialog } from "@/components/table/confirmBulkDeleteDialog";
 import { FilePlus2 } from "lucide-react";
-import DataLoader from "@/components/loader/dataLoader";
 
 export default function VmAction() {
   const { vms, mutate } = useAllVms();
@@ -24,16 +23,6 @@ export default function VmAction() {
   const { deleteVm } = useDeleteVm();
   const { updateVm } = useUpdateVm();
   const [bulkDeleteIds, setBulkDeleteIds] = useState<(number | string)[]>([]);
-
-  const [showLoader, setShowLoader] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowLoader(false);
-    }, 1000); // 1 second delay
-
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleDeleteVm = async (vm: VmEdit) => {
     try {
@@ -135,7 +124,7 @@ export default function VmAction() {
         </Link>
       </div>
       {/* Data Table */}
-      {/* <DataTable
+      <DataTable
         columns={columns}
         data={vms}
         tableName="vm_list"
@@ -143,21 +132,7 @@ export default function VmAction() {
         onEdit={(vm) => setEditVm(vm)}
         onDelete={(vm) => setDeleteVmTarget(vm)}
         onBulkDelete={(ids) => setBulkDeleteIds(ids)}
-      /> */}
-      {!vms || showLoader ? (
-        <DataLoader />
-      ) : (
-        <DataTable
-          columns={columns}
-          data={vms}
-          tableName="vm_list"
-          onView={(vm) => setViewVm(vm)}
-          onEdit={(vm) => setEditVm(vm)}
-          onDelete={(vm) => setDeleteVmTarget(vm)}
-          onBulkDelete={(ids) => setBulkDeleteIds(ids)}
-        />
-      )}
-
+      />
       {viewVm && (
         <ViewModal
           row={viewVm}

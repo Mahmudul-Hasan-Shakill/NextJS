@@ -16,14 +16,12 @@ const logoUrl = "/images/common/brac_logo.png";
 
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-import { ReactNode } from "react";
 pdfMake.vfs = pdfFonts.vfs;
 
 type ViewModalProps<T> = {
   row: T;
   columns: Column<T>[];
   onClose: () => void;
-  children?: ReactNode;
 };
 
 export function ViewModal<T extends Record<string, any>>({
@@ -77,33 +75,11 @@ export function ViewModal<T extends Record<string, any>>({
         {
           table: {
             widths: ["30%", "70%"],
-            body: columns.map(({ key, label }) => {
-              const value = row[key];
 
-              // Handle attachments
-              if (
-                Array.isArray(value) &&
-                value.length > 0 &&
-                value[0]?.downloadUrl
-              ) {
-                return [
-                  { text: label, bold: true },
-                  {
-                    stack: value.map((doc: any) => ({
-                      text: doc.fileName,
-                      link: doc.downloadUrl,
-                      color: "blue",
-                      decoration: "underline",
-                    })),
-                  },
-                ];
-              }
-
-              return [
-                { text: label, bold: true },
-                { text: String(value ?? "") },
-              ];
-            }),
+            body: columns.map(({ key, label }) => [
+              { text: label, bold: true },
+              { text: truncate(String(row[key]), 120) },
+            ]),
           },
           layout: {
             hLineWidth: () => 0.5,
@@ -148,7 +124,7 @@ export function ViewModal<T extends Record<string, any>>({
         </DialogHeader>
 
         <div className="border rounded-md p-3 space-y-2 text-xs">
-          {/* {columns.map(({ key, label }) => (
+          {columns.map(({ key, label }) => (
             <div
               key={String(key)}
               className="flex justify-between border-b pb-1 last:border-b-0"
@@ -159,50 +135,7 @@ export function ViewModal<T extends Record<string, any>>({
                 {truncate(String(row[key]), 120)}
               </span>
             </div>
-          ))} */}
-          {columns.map(({ key, label }) => {
-            const value = row[key];
-
-            let displayValue: ReactNode;
-
-            if (
-              Array.isArray(value) &&
-              value.length > 0 &&
-              value[0]?.downloadUrl
-            ) {
-              // Render list of attachments
-              displayValue = (
-                <ul className="space-y-1 text-right">
-                  {value.map((doc: any) => (
-                    <li key={doc.id}>
-                      <a
-                        href={doc.downloadUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 underline"
-                      >
-                        {doc.fileName}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              );
-            } else {
-              displayValue = <span>{truncate(String(value ?? ""), 120)}</span>;
-            }
-
-            return (
-              <div
-                key={String(key)}
-                className="flex justify-between border-b pb-1 last:border-b-0"
-              >
-                <span className="font-medium">{label}</span>
-                <div className="text-right break-words max-w-[60%]">
-                  {displayValue}
-                </div>
-              </div>
-            );
-          })}
+          ))}
         </div>
         <div className="pt-4 flex justify-end">
           <Button

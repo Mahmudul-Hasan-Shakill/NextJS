@@ -246,7 +246,7 @@ export function AutomationRegister() {
           { name: "falconVersion", label: "Falcon Version", type: "text" },
           { name: "qualysStatus", label: "Qualys Status", type: "text" },
           { name: "qualysVersion", label: "Qualys Version", type: "text" },
-          { name: "diskTotalSize", label: "Mounted Disk Size", type: "text" },
+          { name: "diskTotalSize", label: "Disk Total Size", type: "text" },
           { name: "diskUsed", label: "Disk Used", type: "text" },
           { name: "diskFree", label: "Disk Free", type: "text" },
           { name: "subnetMask", label: "Subnet Mask", type: "text" },

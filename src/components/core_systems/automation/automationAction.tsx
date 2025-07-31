@@ -118,7 +118,7 @@ export default function AutomationAction() {
     { key: "qualysVersion", label: "Qualys Version", type: "text" },
     { key: "qualysInstallDate", label: "Qualys Install Date", type: "date" },
     { key: "qualysStatus", label: "Qualys Status", type: "text" },
-    { key: "diskTotalSize", label: "Mounted Disk Size", type: "text" },
+    { key: "diskTotalSize", label: "Disk Total Size", type: "text" },
     { key: "diskUsed", label: "Disk Used", type: "text" },
     { key: "diskFree", label: "Disk Free", type: "text" },
     { key: "subnetMask", label: "Subnet Mask", type: "text" },
@@ -187,7 +187,7 @@ export default function AutomationAction() {
             try {
               await Promise.all(ids.map((id) => deleteAutomation(Number(id))));
               setBulkDeleteIds([]);
-              setResetSelectionKey((prev) => prev + 1);
+              setResetSelectionKey((prev) => prev + 1); // ✅ Trigger reset
               mutate();
             } catch (error) {
               console.error("Bulk delete failed:", error);
