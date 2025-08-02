@@ -509,22 +509,28 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
-
 import { useUserDetails } from "@/hooks/user/useUserDetails";
 import { useRoleNames } from "@/hooks/role/useRoleNames";
 import { useGuiByRoleName } from "@/hooks/role/useGuiByRoleName";
 import { useUpdateRole } from "@/hooks/role/useUpdateRole";
-import { useDeleteRoleByName } from "@/hooks/role/useDeleteRoleByName";
-import { FilePlus2, Trash2 } from "lucide-react";
+import { useCreateRoles } from "@/hooks/role/useCreateRoles";
+import { FilePlus2, PlusCircle } from "lucide-react";
 import Link from "next/link";
-import { AppModules, PermissionActions } from "@/common/permission";
-import {
-  GuiByRoleNameResponse,
-  Permissions,
-  UpdateRoleDtoFrontend,
-} from "@/types/role";
+import { PermissionActions } from "@/common/permission";
+import { useGuiNames } from "@/hooks/role/useGuiNames";
+import type { GuiPermissions, CreateRoleDtoFrontend } from "@/types/role";
+
+const CRUD_ACTIONS: PermissionActions[] = [
+  PermissionActions.READ,
+  PermissionActions.CREATE,
+  PermissionActions.UPDATE,
+  PermissionActions.DELETE,
+];
+
+const DEFAULT_PERMISSIONS = (): GuiPermissions =>
+  Object.fromEntries(
+    CRUD_ACTIONS.map((action) => [action, false])
+  ) as GuiPermissions;
 
 function formatGuiLabel(path: string): string {
   const segments = path.split("/").filter(Boolean);
@@ -536,139 +542,180 @@ function formatGuiLabel(path: string): string {
     .join(" → ");
 }
 
-function getModuleFromHref(hrefGui: string): AppModules | undefined {
-  if (hrefGui.startsWith("/core/vm")) return AppModules.VM;
-  if (hrefGui.startsWith("/admin-settings/user")) return AppModules.USER;
-  if (hrefGui.startsWith("/admin-settings/role")) return AppModules.ROLE;
-  const firstSegment = hrefGui.split("/").filter(Boolean)[0];
-  if (firstSegment) {
-    const module = Object.values(AppModules).find(
-      (m) => m === firstSegment.toLowerCase()
-    );
-    if (module) return module;
-  }
-  return undefined;
-}
-
 const EditRole: React.FC = () => {
   const { roleNames } = useRoleNames();
   const [selectedRoleName, setSelectedRoleName] = useState("");
-  const [hrefGuis, setHrefGuis] = useState<GuiByRoleNameResponse[]>([]);
-  const { updateRole } = useUpdateRole();
-  const { deleteRoleByName } = useDeleteRoleByName();
+  // Assigned GUI permissions
+  const [permissionsByGui, setPermissionsByGui] = useState<
+    Record<string, GuiPermissions>
+  >({});
+  // Unassigned GUI for "Add"
+  const [addingGui, setAddingGui] = useState<string | null>(null);
+  const [addGuiPermissions, setAddGuiPermissions] = useState<GuiPermissions>(
+    DEFAULT_PERMISSIONS()
+  );
+  // Confirm modals
   const [showConfirm, setShowConfirm] = useState(false);
-  const [roleToDelete, setRoleToDelete] = useState<string | null>(null);
-  const [loadingUpdate, setLoadingUpdate] = useState(false);
-  const [loadingDelete, setLoadingDelete] = useState(false);
+  const [showAddConfirm, setShowAddConfirm] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const userName = useUserDetails();
+  const { updateRole } = useUpdateRole();
+  const { createRoles } = useCreateRoles();
 
-  const { data: guiData, isLoading: isLoadingGuiData } =
-    useGuiByRoleName(selectedRoleName);
+  const { data: guiData } = useGuiByRoleName(selectedRoleName);
+  const { data: allGuiNames = [] } = useGuiNames();
 
+  // Build assigned and unassigned GUIs
+  const assignedGuiNames = (guiData || []).map((g) => g.hrefGui);
+  const assignedGuiData = (guiData || []).reduce((acc, gui) => {
+    acc[gui.hrefGui] = {
+      [PermissionActions.READ]: gui.permissions?.read ?? false,
+      [PermissionActions.CREATE]: gui.permissions?.create ?? false,
+      [PermissionActions.UPDATE]: gui.permissions?.update ?? false,
+      [PermissionActions.DELETE]: gui.permissions?.delete ?? false,
+    };
+    return acc;
+  }, {} as Record<string, GuiPermissions>);
+  const unassignedGuiNames = allGuiNames.filter(
+    (gui) => !assignedGuiNames.includes(gui)
+  );
+
+  // On change, keep permissions in sync for assigned GUIs only
   useEffect(() => {
-    if (selectedRoleName && Array.isArray(guiData)) {
-      setHrefGuis(guiData);
-    } else {
-      setHrefGuis([]);
-    }
+    setPermissionsByGui(assignedGuiData);
   }, [selectedRoleName, guiData]);
 
-  const handleGuiActiveChange = (href: string) => {
-    setHrefGuis((prev) =>
-      prev.map((item) =>
-        item.hrefGui === href ? { ...item, isActive: !item.isActive } : item
-      )
-    );
-  };
-
+  // Edit assigned GUI permissions
   const handlePermissionChange = (
-    href: string,
-    module: AppModules,
-    action: PermissionActions,
-    checked: boolean
+    hrefGui: string,
+    action: PermissionActions
   ) => {
-    setHrefGuis((prevGuis) =>
-      prevGuis.map((gui) => {
-        if (gui.hrefGui === href) {
-          const newPermissions: Permissions = { ...gui.permissions };
-          if (!newPermissions[module]) {
-            newPermissions[module] = {};
-          }
-          newPermissions[module][action] = checked;
-          return { ...gui, permissions: newPermissions };
-        }
-        return gui;
-      })
-    );
+    setPermissionsByGui((prev) => ({
+      ...prev,
+      [hrefGui]: {
+        ...prev[hrefGui],
+        [action]: !(prev[hrefGui]?.[action] ?? false),
+      },
+    }));
   };
 
+  const handleSelectAll = (hrefGui: string, checked: boolean) => {
+    setPermissionsByGui((prev) => ({
+      ...prev,
+      [hrefGui]: {
+        [PermissionActions.READ]: checked,
+        [PermissionActions.CREATE]: checked,
+        [PermissionActions.UPDATE]: checked,
+        [PermissionActions.DELETE]: checked,
+      },
+    }));
+  };
+
+  // Edit: update assigned GUI permissions
   const handleSubmit = async () => {
+    if (!selectedRoleName) {
+      toast.warning("Please select a role name.");
+      return;
+    }
     const editBy = userName;
     const editDate = new Date().toISOString();
-
-    const updatedHrefGuis = hrefGuis.map((item) => ({
-      hrefGui: item.hrefGui,
-      isActive: item.isActive,
-      editBy,
-      editDate,
-    }));
-
-    const aggregatedPermissions: Permissions = {};
-    hrefGuis.forEach((gui) => {
-      const module = getModuleFromHref(gui.hrefGui);
-      if (module && gui.permissions?.[module]) {
-        aggregatedPermissions[module] = {
-          ...aggregatedPermissions[module],
-          ...gui.permissions[module],
-        };
-      }
+    const guiEntries = Object.entries(permissionsByGui);
+    const guiPermissions = guiEntries.map(([hrefGui, perms]) => {
+      const atLeastOne = CRUD_ACTIONS.some((action) => perms[action]);
+      return {
+        hrefGui,
+        isActive: atLeastOne,
+        permissions: perms,
+        editBy,
+        editDate,
+      };
     });
 
-    const roleData: UpdateRoleDtoFrontend = {
+    const roleData = {
       roleName: selectedRoleName,
-      hrefGui: updatedHrefGuis,
-      permissions: aggregatedPermissions,
+      guiPermissions,
     };
 
-    setLoadingUpdate(true);
+    setIsSubmitting(true);
     try {
       const result = await updateRole(roleData);
       if (result?.isSuccessful) {
         toast.success(result.message);
+        setShowConfirm(false);
+        // Soft-reload: clear and re-select role to refresh GUIs
+        setSelectedRoleName("");
+        setTimeout(() => {
+          setSelectedRoleName(roleData.roleName);
+          setIsSubmitting(false);
+        }, 100);
       } else {
-        toast.error(result?.message || "Failed to update role.");
+        toast.error(result?.message);
+        setIsSubmitting(false);
       }
-    } catch (error) {
+    } catch {
       toast.error("Unexpected error occurred.");
-    } finally {
-      setLoadingUpdate(false);
+      setIsSubmitting(false);
     }
   };
 
-  const confirmDeleteRole = (roleName: string) => {
-    setRoleToDelete(roleName);
-    setShowConfirm(true);
+  // Add unassigned GUI to this role
+  const handleAddGui = (gui: string) => {
+    setAddingGui(gui);
+    setAddGuiPermissions(DEFAULT_PERMISSIONS());
+    setShowAddConfirm(true);
+  };
+  const handleAddGuiPermChange = (action: PermissionActions) => {
+    setAddGuiPermissions((prev) => ({
+      ...prev,
+      [action]: !prev[action],
+    }));
+  };
+  const handleAddGuiSelectAll = (checked: boolean) => {
+    setAddGuiPermissions({
+      [PermissionActions.READ]: checked,
+      [PermissionActions.CREATE]: checked,
+      [PermissionActions.UPDATE]: checked,
+      [PermissionActions.DELETE]: checked,
+    });
   };
 
-  const handleDelete = async () => {
-    if (!roleToDelete) return;
-    setLoadingDelete(true);
+  const handleConfirmAddGui = async () => {
+    if (!selectedRoleName || !addingGui) {
+      setShowAddConfirm(false);
+      return;
+    }
+    const makeBy = userName;
+    const makeDate = new Date().toISOString();
+    const newRole: CreateRoleDtoFrontend = {
+      roleName: selectedRoleName,
+      hrefGui: addingGui,
+      permissions: addGuiPermissions,
+      isActive: CRUD_ACTIONS.some((action) => addGuiPermissions[action]),
+      makeBy,
+      makeDate,
+    };
 
+    setIsSubmitting(true);
     try {
-      const result = await deleteRoleByName(roleToDelete);
-      if (result?.isSuccessful) {
-        toast.success(result.message);
+      const response = await createRoles([newRole]);
+      if (response?.isSuccessful) {
+        toast.success("GUI added to role!");
+        setShowAddConfirm(false);
+        setAddingGui(null);
+        // Soft-reload: clear and re-select role to refresh GUIs
         setSelectedRoleName("");
-        setHrefGuis([]);
+        setTimeout(() => {
+          setSelectedRoleName(newRole.roleName);
+          setIsSubmitting(false);
+        }, 100);
       } else {
-        toast.error(result?.message || "Failed to delete role.");
+        toast.error(response?.message || "Failed to add GUI.");
+        setIsSubmitting(false);
       }
-    } catch (error) {
-      toast.error("Failed to delete role.");
-    } finally {
-      setLoadingDelete(false);
-      setShowConfirm(false);
-      setRoleToDelete(null);
+    } catch {
+      toast.error("Unexpected error occurred.");
+      setIsSubmitting(false);
     }
   };
 
@@ -681,7 +728,6 @@ const EditRole: React.FC = () => {
           </Button>
         </Link>
       </div>
-
       <Card>
         <CardHeader>
           <h2 className="text-xl font-semibold">Edit Role</h2>
@@ -690,22 +736,22 @@ const EditRole: React.FC = () => {
           <form
             onSubmit={(e: FormEvent<HTMLFormElement>) => {
               e.preventDefault();
-              handleSubmit();
+              setShowConfirm(true);
             }}
             className="space-y-6"
           >
+            {/* Role Name Dropdown */}
             <div className="space-y-2">
               <Label className="py-4">Select Role Name</Label>
               <Select
                 value={selectedRoleName}
                 onValueChange={setSelectedRoleName}
-                disabled={!roleNames || roleNames.length === 0}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select role..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {roleNames?.map((name) => (
+                  {roleNames.map((name) => (
                     <SelectItem key={name} value={name}>
                       {name}
                     </SelectItem>
@@ -714,139 +760,121 @@ const EditRole: React.FC = () => {
               </Select>
             </div>
 
-            {selectedRoleName && (
-              <div className="space-y-2">
-                <Label>GUI Paths & Permissions</Label>
-                <Separator />
-                {isLoadingGuiData ? (
-                  <Skeleton className="h-40 w-full" />
-                ) : (
-                  <div className="grid grid-cols-1 gap-4">
-                    {hrefGuis.map((hrefItem) => {
-                      const module = getModuleFromHref(hrefItem.hrefGui);
+            {/* Assigned GUI permissions */}
+            <div className="space-y-2">
+              <Label>Assigned GUI Permissions</Label>
+              <div className="-mx-6 px-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {Object.entries(permissionsByGui).length === 0 ? (
+                    <span className="text-muted-foreground">
+                      No assigned GUI yet.
+                    </span>
+                  ) : (
+                    Object.entries(permissionsByGui).map(([hrefGui, perms]) => {
+                      const isAllSelected = CRUD_ACTIONS.every((a) => perms[a]);
                       return (
-                        <Card key={hrefItem.hrefGui} className="p-4">
-                          <div className="flex items-center space-x-2 mb-2">
-                            <Checkbox
-                              id={hrefItem.hrefGui}
-                              checked={hrefItem.isActive}
-                              onCheckedChange={(checked) =>
-                                handleGuiActiveChange(hrefItem.hrefGui)
-                              }
-                            />
-                            <Label
-                              className="text-sm font-medium"
-                              htmlFor={hrefItem.hrefGui}
-                            >
-                              {formatGuiLabel(hrefItem.hrefGui)} (
-                              {hrefItem.hrefGui})
-                            </Label>
-                          </div>
-
-                          {module && (
-                            <div className="ml-6 mt-2 space-y-1">
-                              <Label className="text-xs text-muted-foreground">
-                                Permissions for {module.toUpperCase()} Module:
+                        <Card
+                          key={hrefGui}
+                          className="p-4 rounded-2xl shadow-sm min-w-[260px]"
+                        >
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="font-semibold text-primary">
+                              {formatGuiLabel(hrefGui)}
+                            </span>
+                            <div className="flex items-center gap-1">
+                              <Checkbox
+                                checked={isAllSelected}
+                                onCheckedChange={(checked) =>
+                                  handleSelectAll(hrefGui, !!checked)
+                                }
+                                id={`select-all-${hrefGui}`}
+                              />
+                              <Label
+                                htmlFor={`select-all-${hrefGui}`}
+                                className="text-xs font-normal"
+                              >
+                                All
                               </Label>
-                              <div className="flex flex-wrap gap-x-4 gap-y-1">
-                                {Object.values(PermissionActions).map(
-                                  (action) => {
-                                    const isChecked =
-                                      hrefItem.permissions?.[module]?.[
-                                        action
-                                      ] ?? false;
-                                    const isDisabled =
-                                      action === PermissionActions.READ;
-
-                                    return (
-                                      <div
-                                        key={`${hrefItem.hrefGui}-${action}`}
-                                        className="flex items-center space-x-1"
-                                      >
-                                        <Checkbox
-                                          id={`${hrefItem.hrefGui}-${action}`}
-                                          checked={isChecked}
-                                          onCheckedChange={(checked) =>
-                                            handlePermissionChange(
-                                              hrefItem.hrefGui,
-                                              module,
-                                              action,
-                                              checked as boolean
-                                            )
-                                          }
-                                          disabled={isDisabled}
-                                        />
-                                        <Label
-                                          htmlFor={`${hrefItem.hrefGui}-${action}`}
-                                          className="text-xs"
-                                        >
-                                          {action.toUpperCase()}
-                                        </Label>
-                                      </div>
-                                    );
-                                  }
-                                )}
-                              </div>
                             </div>
-                          )}
+                          </div>
+                          <div className="flex gap-4 flex-wrap mt-2">
+                            {CRUD_ACTIONS.map((action) => (
+                              <label
+                                key={action}
+                                className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-lg cursor-pointer ${
+                                  perms[action]
+                                    ? "bg-blue-50 text-blue-600"
+                                    : "bg-muted"
+                                }`}
+                              >
+                                <Checkbox
+                                  checked={!!perms[action]}
+                                  onCheckedChange={() =>
+                                    handlePermissionChange(hrefGui, action)
+                                  }
+                                  id={`${hrefGui}-${action}`}
+                                />
+                                <span className="capitalize">{action}</span>
+                              </label>
+                            ))}
+                          </div>
                         </Card>
                       );
-                    })}
-                  </div>
-                )}
+                    })
+                  )}
+                </div>
               </div>
-            )}
+            </div>
 
-            <div className="flex justify-end">
-              <Button
-                type="submit"
-                disabled={
-                  loadingUpdate || !selectedRoleName || isLoadingGuiData
-                }
-              >
-                {loadingUpdate ? "Updating..." : "Submit"}
+            <div className="flex justify-end pt-2">
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Updating..." : "Update"}
               </Button>
             </div>
           </form>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <h2 className="text-xl font-semibold text-red-600">Delete Roles</h2>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {roleNames?.map((role) => (
-              <div
-                key={role}
-                className="flex items-center justify-between border rounded px-4 py-2"
-              >
-                <span className="font-medium">{role}</span>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => confirmDeleteRole(role)}
-                  disabled={loadingDelete}
-                >
-                  <Trash2 className="w-4 h-4 mr-1" />
-                  Delete
-                </Button>
+          {/* Unassigned GUIs - add new */}
+          <div className="space-y-2 pt-8">
+            <Label>Unassigned GUIs</Label>
+            <div className="-mx-6 px-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {unassignedGuiNames.length === 0 ? (
+                  <span className="text-muted-foreground">
+                    All GUIs assigned.
+                  </span>
+                ) : (
+                  unassignedGuiNames.map((gui) => (
+                    <Card
+                      key={gui}
+                      className="p-4 rounded-2xl shadow min-w-[260px] flex items-center justify-between"
+                    >
+                      <span className="font-semibold text-primary">
+                        {formatGuiLabel(gui)}
+                      </span>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        title="Add to role"
+                        onClick={() => handleAddGui(gui)}
+                      >
+                        <PlusCircle className="w-5 h-5" />
+                      </Button>
+                    </Card>
+                  ))
+                )}
               </div>
-            ))}
+            </div>
           </div>
         </CardContent>
       </Card>
 
+      {/* Edit Confirm Modal */}
       <Dialog open={showConfirm} onOpenChange={setShowConfirm}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogTitle>Confirm Update</DialogTitle>
             <DialogDescription>
-              Are you sure you want to{" "}
-              <strong className="text-red-600">delete</strong> the role{" "}
-              <strong>{roleToDelete}</strong>? This will delete all associated
-              GUI paths and permissions for this role.
+              Are you sure you want to update the role{" "}
+              <strong>{selectedRoleName}</strong>?
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex justify-end gap-2">
@@ -854,11 +882,78 @@ const EditRole: React.FC = () => {
               Cancel
             </Button>
             <Button
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={loadingDelete}
+              onClick={() => {
+                setShowConfirm(false);
+                handleSubmit();
+              }}
+              disabled={isSubmitting}
             >
-              {loadingDelete ? "Deleting..." : "Yes, Delete"}
+              {isSubmitting ? "Updating..." : "Yes, Update"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add GUI to Role Modal */}
+      <Dialog open={showAddConfirm} onOpenChange={setShowAddConfirm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              Assign GUI to{" "}
+              <span className="text-primary">{selectedRoleName}</span>
+            </DialogTitle>
+            <DialogDescription>
+              Set permissions for{" "}
+              <strong>{formatGuiLabel(addingGui || "")}</strong>
+            </DialogDescription>
+          </DialogHeader>
+          {/* Permissions for the new GUI */}
+          <div className="flex justify-between items-center mb-3">
+            <span className="font-semibold">Permissions</span>
+            <div className="flex items-center gap-1">
+              <Checkbox
+                checked={CRUD_ACTIONS.every((a) => addGuiPermissions[a])}
+                onCheckedChange={(checked) => handleAddGuiSelectAll(!!checked)}
+                id="addgui-select-all"
+              />
+              <Label
+                htmlFor="addgui-select-all"
+                className="text-xs font-normal"
+              >
+                All
+              </Label>
+            </div>
+          </div>
+          <div className="flex gap-4 flex-wrap mb-2">
+            {CRUD_ACTIONS.map((action) => (
+              <label
+                key={action}
+                className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-lg cursor-pointer ${
+                  addGuiPermissions[action]
+                    ? "bg-blue-50 text-blue-600"
+                    : "bg-muted"
+                }`}
+              >
+                <Checkbox
+                  checked={!!addGuiPermissions[action]}
+                  onCheckedChange={() => handleAddGuiPermChange(action)}
+                  id={`addgui-${action}`}
+                />
+                <span className="capitalize">{action}</span>
+              </label>
+            ))}
+          </div>
+          <DialogFooter className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowAddConfirm(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmAddGui}
+              disabled={
+                isSubmitting || !CRUD_ACTIONS.some((a) => addGuiPermissions[a])
+              }
+            >
+              {isSubmitting ? "Adding..." : "Add GUI to Role"}
             </Button>
           </DialogFooter>
         </DialogContent>

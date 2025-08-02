@@ -1,19 +1,14 @@
-// src/types/role.ts
+import { PermissionActions } from "@/common/permission";
 
-import { AppModules, PermissionActions } from "@/common/permission";
-
-export type ModulePermissions = {
-  [key in PermissionActions]?: boolean;
-};
-
-export type Permissions = {
-  [key in AppModules]?: ModulePermissions;
+// The permission object for a GUI
+export type GuiPermissions = {
+  [key in PermissionActions]: boolean;
 };
 
 export interface CreateRoleDtoFrontend {
   roleName: string;
   hrefGui: string;
-  permissions?: Permissions;
+  permissions?: GuiPermissions; // <- Only the CRUD object for this GUI
   makeBy?: string;
   makeDate?: string;
   isActive?: boolean;
@@ -23,7 +18,7 @@ export interface RoleBackendResponse {
   id: number;
   roleName: string;
   hrefGui: string;
-  permissions: Permissions;
+  permissions: GuiPermissions; // CRUD object
   makeBy: string;
   makeDate: string;
   editBy: string | null;
@@ -33,18 +28,18 @@ export interface RoleBackendResponse {
 
 export interface UpdateRoleDtoFrontend {
   roleName: string;
-  hrefGui: {
+  guiPermissions: {
     hrefGui: string;
     isActive: boolean;
+    permissions: { [k: string]: boolean };
     editBy: string;
     editDate?: string;
   }[];
-  permissions?: Permissions;
 }
 
-// Updated: GuiByRoleNameResponse now includes permissions
+// For getGuiByRoleName:
 export interface GuiByRoleNameResponse {
   hrefGui: string;
   isActive: boolean;
-  permissions: Permissions; // Added permissions to this structure
+  permissions: GuiPermissions;
 }
