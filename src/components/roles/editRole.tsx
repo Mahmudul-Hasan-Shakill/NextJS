@@ -653,8 +653,9 @@ const EditRole: React.FC = () => {
         toast.error(result?.message);
         setIsSubmitting(false);
       }
-    } catch {
-      toast.error("Unexpected error occurred.");
+    } catch (err: any) {
+      const errorMessage = err?.message || "Unexpected error occurred.";
+      toast.error(errorMessage);
       setIsSubmitting(false);
     }
   };
@@ -778,7 +779,7 @@ const EditRole: React.FC = () => {
                           className="p-4 rounded-2xl shadow-sm min-w-[260px]"
                         >
                           <div className="flex justify-between items-center mb-1">
-                            <span className="font-semibold text-primary">
+                            <span className="font-semibold text-primary text-sm">
                               {formatGuiLabel(hrefGui)}
                             </span>
                             <div className="flex items-center gap-1">

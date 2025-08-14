@@ -33,7 +33,6 @@ export function useUpdateRole() {
       const response = await roleService.updateRole(roleData);
       return response;
     } catch (err) {
-      console.error("Error updating role:", err);
       throw err;
     } finally {
       setLoading(false);

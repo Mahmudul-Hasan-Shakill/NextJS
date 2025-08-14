@@ -187,7 +187,7 @@ export function SidebarDesktop({ sidebarItems }: SidebarDesktopProps) {
               priority
             />
             <span
-              className="self-center text-[8px] font-semibold sm:text-[8px] lg:text-[10px] text-sky-900 dark:text-yellow-400 max-w-[120px] truncate"
+              className="self-center text-[8px] font-semibold sm:text-[8px] lg:text-[10px] text-sky-900 dark:text-yellow-400 truncate"
               title={userName || "Loading..."}
             >
               Hi, <span className="truncate">{userName || "Loading..."}</span>

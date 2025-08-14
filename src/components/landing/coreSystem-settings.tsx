@@ -65,4 +65,12 @@ export const projects = [
     title: "Cluster Update",
     link: "/core-systems/cluster-update",
   },
+  {
+    title: "Physical Host Creation",
+    link: "/core-systems/physical-host-creation",
+  },
+  {
+    title: "Physical Host Update",
+    link: "/core-systems/physical-host-update",
+  },
 ];

@@ -16,19 +16,21 @@ const handleResponse = async (res: Response) => {
   return data;
 };
 
-export const clusterService = {
-  async createCluster(createClusterDto: any) {
-    const res = await fetch(`${baseUrl}cluster`, {
+export const physicalHostService = {
+  // Create physical host
+  async createPhysicalHost(createDto: any) {
+    const res = await fetch(`${baseUrl}physical-hosts`, {
       method: "POST",
       headers: getAuthHeaders(),
       credentials: "include",
-      body: JSON.stringify(createClusterDto),
+      body: JSON.stringify(createDto),
     });
     return handleResponse(res);
   },
 
-  async getAllClusters() {
-    const res = await fetch(`${baseUrl}cluster`, {
+  // Get all physical hosts
+  async getAllPhysicalHosts() {
+    const res = await fetch(`${baseUrl}physical-hosts`, {
       method: "GET",
       headers: getAuthHeaders(),
       credentials: "include",
@@ -36,8 +38,9 @@ export const clusterService = {
     return handleResponse(res);
   },
 
-  async getCluster(id: number) {
-    const res = await fetch(`${baseUrl}cluster/${id}`, {
+  // Get physical host by ID
+  async getPhysicalHost(id: number) {
+    const res = await fetch(`${baseUrl}physical-hosts/${id}`, {
       method: "GET",
       headers: getAuthHeaders(),
       credentials: "include",
@@ -45,18 +48,20 @@ export const clusterService = {
     return handleResponse(res);
   },
 
-  async updateCluster(id: number, updateClusterDto: any) {
-    const res = await fetch(`${baseUrl}cluster/${id}`, {
+  // Update physical host by ID
+  async updatePhysicalHost(id: number, updateDto: any) {
+    const res = await fetch(`${baseUrl}physical-hosts/${id}`, {
       method: "PATCH",
       headers: getAuthHeaders(),
       credentials: "include",
-      body: JSON.stringify(updateClusterDto),
+      body: JSON.stringify(updateDto),
     });
     return handleResponse(res);
   },
 
-  async deleteCluster(id: number) {
-    const res = await fetch(`${baseUrl}cluster/${id}`, {
+  // Delete physical host by ID
+  async deletePhysicalHost(id: number) {
+    const res = await fetch(`${baseUrl}physical-hosts/${id}`, {
       method: "DELETE",
       headers: getAuthHeaders(),
       credentials: "include",
@@ -64,16 +69,14 @@ export const clusterService = {
     return handleResponse(res);
   },
 
-  async getClusterNames(): Promise<{
-    isSuccessful: boolean;
-    message: string;
-    data: string[];
-  }> {
-    const res = await fetch(`${baseUrl}cluster/names`, {
+  // Get physical hosts summary
+  async getPhysicalHostsSummary() {
+    const res = await fetch(`${baseUrl}physical-hosts/summary`, {
       method: "GET",
       headers: getAuthHeaders(),
       credentials: "include",
     });
     return handleResponse(res);
   },
+  
 };

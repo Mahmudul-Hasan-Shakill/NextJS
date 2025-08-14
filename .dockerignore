@@ -1,0 +1,9 @@
+# client/.dockerignore
+node_modules
+.next
+.cache
+.git
+Dockerfile
+npm-debug.log*
+yarn-error.log*
+pnpm-lock.yaml
