@@ -17,16 +17,16 @@ const sidebarItems: SidebarItems = {
       icon: Server,
       label: "Core Systems",
     },
-    {
-      href: "/core-systems",
-      icon: Network,
-      label: "Network Solutions",
-    },
-    {
-      href: "/core-systems",
-      icon: MonitorCog,
-      label: "System Administration",
-    },
+    // {
+    //   href: "/core-systems",
+    //   icon: Network,
+    //   label: "Network Solutions",
+    // },
+    // {
+    //   href: "/core-systems",
+    //   icon: MonitorCog,
+    //   label: "System Administration",
+    // },
   ],
 };
 

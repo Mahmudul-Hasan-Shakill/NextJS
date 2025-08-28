@@ -234,6 +234,7 @@ type Column<T> = {
     | "multiselect"
     | "boolean"
     | "number"
+    | "time"
     | "date"
     | "email"
     | "textarea"

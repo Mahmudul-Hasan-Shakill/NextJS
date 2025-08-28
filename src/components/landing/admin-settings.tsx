@@ -25,4 +25,12 @@ export const projects = [
     title: "Role Update",
     link: "/admin-settings/role-update",
   },
+  {
+    title: "Dynamic Columns",
+    link: "/admin-settings/dynamic-column",
+  },
+  {
+    title: "Dynamic View",
+    link: "/admin-settings/dynamic-view",
+  },
 ];

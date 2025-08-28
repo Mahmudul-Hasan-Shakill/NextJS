@@ -1,6 +1,6 @@
 "use client";
 
-import React, { JSX, useCallback } from "react";
+import React, { JSX, useCallback, useEffect } from "react";
 import { useState, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { ColumnToggleMenu } from "./columnToggleMenu";
@@ -34,6 +34,7 @@ export type Column<T> = {
     | "boolean"
     | "number"
     | "date"
+    | "time"
     | "email"
     | "textarea"
     | "radio"
@@ -89,6 +90,19 @@ export function DataTable<T extends { id: number | string }>({
   const [debouncedSearch] = useDebounce(search, 300);
   const [debouncedColumnFilters] = useDebounce(columnFilters, 300);
   const [selectedRowIds, setSelectedRowIds] = useState<(number | string)[]>([]);
+
+  useEffect(() => {
+    const incomingKeys = columns.map((c) => c.key);
+
+    setVisibleColumns((prev) => {
+      // add new keys while preserving user-chosen ones that still exist
+      const prevSet = new Set(prev);
+      incomingKeys.forEach((k) => prevSet.add(k));
+      // remove keys no longer present
+      const merged = incomingKeys.filter((k) => prevSet.has(k));
+      return merged as (keyof T)[];
+    });
+  }, [columns]);
 
   const filteredData = useMemo(() => {
     let filtered = data.filter((item) => {
@@ -179,7 +193,7 @@ export function DataTable<T extends { id: number | string }>({
   };
 
   return (
-    <div className="p-4 rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-black text-black dark:text-white space-y-4 text-xs">
+    <div className="p-4 rounded-md border border-gray-300 dark:border-gray-700 bg-gray-100/20 dark:bg-zinc-950 text-black dark:text-white space-y-4 text-xs">
       {/* Top Action Bar */}
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative">

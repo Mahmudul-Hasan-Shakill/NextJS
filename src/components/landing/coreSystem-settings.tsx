@@ -73,4 +73,12 @@ export const projects = [
     title: "Physical Host Update",
     link: "/core-systems/physical-host-update",
   },
+  {
+    title: "Filesystem Creation",
+    link: "/core-systems/filesystem-creation",
+  },
+  {
+    title: "Filesystem Update",
+    link: "/core-systems/filesystem-update",
+  },
 ];

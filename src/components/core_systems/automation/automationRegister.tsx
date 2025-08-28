@@ -135,7 +135,7 @@ export function AutomationRegister() {
   if (loading) return <DataLoader />;
 
   return (
-    <div className="mx-auto w-full max-w-5xl bg-white p-6 rounded-lg shadow-md dark:bg-black text-[10px]">
+    <div className="mx-auto w-full max-w-6xl bg-gray-100 p-6 rounded-lg shadow-md dark:bg-zinc-950 text-[10px]">
       <h2 className="text-xl font-bold text-center mb-6 text-black dark:text-white">
         Register Automation Server
       </h2>

@@ -110,7 +110,7 @@ export function UserRegister() {
   if (loading) return <DataLoader />;
 
   return (
-    <div className="mx-auto w-full max-w-5xl bg-white p-6 rounded-lg shadow-md dark:bg-black">
+    <div className="mx-auto w-full max-w-6xl bg-white p-6 rounded-lg shadow-md dark:bg-black">
       <h2 className="text-xl font-bold text-center mb-6 text-black dark:text-white">
         Register User
       </h2>
