@@ -1,6 +1,13 @@
 "use client";
 
-import { Home, Network, Server, Settings, MonitorCog } from "lucide-react";
+import {
+  Home,
+  Network,
+  Server,
+  Settings,
+  MonitorCog,
+  Laptop,
+} from "lucide-react";
 import { SidebarDesktop } from "./sidebar-desktop";
 import { SidebarItems } from "@/types/types";
 
@@ -27,6 +34,11 @@ const sidebarItems: SidebarItems = {
     //   icon: MonitorCog,
     //   label: "System Administration",
     // },
+    {
+      href: "/device-inventory",
+      icon: Laptop,
+      label: "Device Inventory",
+    },
   ],
 };
 

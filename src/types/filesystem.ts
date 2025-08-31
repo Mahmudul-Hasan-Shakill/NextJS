@@ -2,18 +2,19 @@
 export interface FilesystemReg {
   // static fields
   application: string;
-  node: string;
-  ipAddress: string;
-  backupEnvironment: string;
-  backupType: string;
-  subClientName: string;
-  contentDetails: string;
-  backupSchedule: string;
-  storagePolicy: string;
-  backupStartTime: string;
-  backupEndTime: string;
-  fullBackupSize: string;
-  retention: string;
+  node?: string;
+  ipAddress?: string;
+  backupEnvironment?: string;
+  backupType?: string;
+  subClientName?: string;
+  contentDetails?: string;
+  scheduleType?: string;
+  backupSchedule?: string;
+  storagePolicy?: string;
+  backupStartTime?: string;
+  backupEndTime?: string;
+  fullBackupSize?: string;
+  retention?: string;
 
   // common
   isActive?: boolean;

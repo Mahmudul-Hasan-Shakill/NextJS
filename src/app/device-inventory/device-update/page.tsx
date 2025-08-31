@@ -1,22 +1,22 @@
 import MainLayout from "@/components/layout/main-layout";
 import React from "react";
 import Breadcrumb from "@/components/breadcrumb/breadcrumb";
-import { CoreSystem_Settings } from "@/components/landing/coreSystem-settings";
+import DeviceAction from "@/components/device/deviceAction";
 
 export const metadata = {
-  title: "Core Systems",
+  title: "Device-Update",
   description: "Developed by Core Systems",
 };
 
-const CoreSystemPage: React.FC = () => {
+const DeviceUpdate: React.FC = () => {
   return (
     <>
       <MainLayout>
         <Breadcrumb pageName={metadata.title} />
-        <CoreSystem_Settings />
+        <DeviceAction />
       </MainLayout>
     </>
   );
 };
 
-export default CoreSystemPage;
+export default DeviceUpdate;

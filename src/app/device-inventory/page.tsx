@@ -1,22 +1,22 @@
 import MainLayout from "@/components/layout/main-layout";
 import React from "react";
 import Breadcrumb from "@/components/breadcrumb/breadcrumb";
-import { CoreSystem_Settings } from "@/components/landing/coreSystem-settings";
+import { DeviceInventory_Settings } from "@/components/landing/deviceInventory-settings";
 
 export const metadata = {
-  title: "Core Systems",
+  title: "Device Inventory",
   description: "Developed by Core Systems",
 };
 
-const CoreSystemPage: React.FC = () => {
+const DeviceInventoryPage: React.FC = () => {
   return (
     <>
       <MainLayout>
         <Breadcrumb pageName={metadata.title} />
-        <CoreSystem_Settings />
+        <DeviceInventory_Settings />
       </MainLayout>
     </>
   );
 };
 
-export default CoreSystemPage;
+export default DeviceInventoryPage;
