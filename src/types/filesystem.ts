@@ -4,6 +4,7 @@ export interface FilesystemReg {
   application: string;
   node?: string;
   ipAddress?: string;
+  os?: string;
   backupEnvironment?: string;
   backupType?: string;
   subClientName?: string;

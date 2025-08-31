@@ -86,6 +86,7 @@ export function FilesystemRegister() {
     "application",
     "node",
     "ipAddress",
+    "os",
     "backupEnvironment",
     "backupType",
     "subClientName",
@@ -103,8 +104,9 @@ export function FilesystemRegister() {
     application: "",
     node: "",
     ipAddress: "",
+    os: "",
     backupEnvironment: "",
-    backupType: "FileSystem",
+    backupType: "",
     subClientName: "",
     contentDetails: "",
     scheduleType: "",
@@ -228,6 +230,7 @@ export function FilesystemRegister() {
     { name: "application", label: "Application", type: "text", required: true },
     { name: "node", label: "Node", type: "text", required: true },
     { name: "ipAddress", label: "IP Address", type: "text", required: true },
+    { name: "os", label: "OS", type: "text", required: true },
     {
       name: "backupEnvironment",
       label: "Backup Environment",
@@ -312,7 +315,7 @@ export function FilesystemRegister() {
       case "WEEKLY":
         return {
           name: "backupSchedule",
-          label: "Backup Day (Weekly)",
+          label: "Full Backup",
           type: "multiselect",
           required: true,
           options: DAYS_OF_WEEK,
@@ -320,7 +323,7 @@ export function FilesystemRegister() {
       case "MONTHLY":
         return {
           name: "backupSchedule",
-          label: "Backup Day of Month",
+          label: "Full Backup",
           type: "multiselect",
           required: true,
           options: DAYS_OF_MONTH,
@@ -328,7 +331,7 @@ export function FilesystemRegister() {
       case "YEARLY":
         return {
           name: "backupSchedule",
-          label: "Backup Date (Yearly)",
+          label: "Full Backup",
           type: "date",
           required: true,
         };

@@ -677,6 +677,7 @@ const STATIC_KEYS: (keyof FilesystemEdit)[] = [
   "application",
   "node",
   "ipAddress",
+  "os",
   "backupEnvironment",
   "backupType",
   "subClientName",
@@ -759,11 +760,12 @@ export default function FilesystemAction() {
       { key: "application", label: "Application", type: "text" },
       { key: "node", label: "Node", type: "text" },
       { key: "ipAddress", label: "IP Address", type: "text" },
+      { key: "os", label: "OS", type: "text" },
       { key: "backupEnvironment", label: "Backup Environment", type: "text" },
       { key: "backupType", label: "Backup Type", type: "text" },
       { key: "subClientName", label: "Sub Client Name", type: "text" },
       { key: "scheduleType", label: "Schedule Type", type: "text" },
-      { key: "backupSchedule", label: "Backup Schedule", type: "text" },
+      { key: "backupSchedule", label: "Full Backup", type: "text" },
       { key: "storagePolicy", label: "Storage Policy", type: "text" },
       { key: "backupStartTime", label: "Backup Start", type: "time" },
       { key: "backupEndTime", label: "Backup End", type: "time" },
@@ -836,21 +838,21 @@ export default function FilesystemAction() {
       if (mode === "WEEKLY") {
         base[idxBackup] = {
           key: "backupSchedule",
-          label: "Backup Day (Weekly)",
+          label: "Full Backup",
           type: "multiselect",
           options: DAYS_OF_WEEK,
         };
       } else if (mode === "MONTHLY") {
         base[idxBackup] = {
           key: "backupSchedule",
-          label: "Backup Day of Month",
+          label: "Full Backup",
           type: "multiselect",
           options: DAYS_OF_MONTH,
         };
       } else if (mode === "YEARLY") {
         base[idxBackup] = {
           key: "backupSchedule",
-          label: "Backup Date (Yearly)",
+          label: "Full Backup",
           type: "date",
         };
       } else {
