@@ -53,7 +53,7 @@ export function PaginationControls({
             <SelectValue placeholder="Rows" />
           </SelectTrigger>
           <SelectContent>
-            {[10, 20, 50, 100].map((num) => (
+            {[10, 20, 50, 100, 500, 1000, 2000, 5000].map((num) => (
               <SelectItem key={num} value={String(num)} className="text-xs">
                 {num}
               </SelectItem>
