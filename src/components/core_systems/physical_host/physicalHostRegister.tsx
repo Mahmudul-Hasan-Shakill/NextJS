@@ -121,11 +121,7 @@ export function PhysicalHostRegister() {
         {/* Required Fields Section */}
         <EditField
           name="hostname"
-          label={
-            <>
-              Hostname <span className="text-red-500">*</span>
-            </>
-          }
+          label="Hostname"
           type="text"
           value={formData.hostname}
           onChange={handleChange}
@@ -136,11 +132,7 @@ export function PhysicalHostRegister() {
 
         <EditField
           name="physicalIp"
-          label={
-            <>
-              Physical IP <span className="text-red-500">*</span>
-            </>
-          }
+          label="Physical IP"
           type="text"
           value={formData.physicalIp}
           onChange={handleChange}
