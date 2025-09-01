@@ -38,3 +38,4 @@ const HomeTabs: React.FC = () => {
 };
 
 export default HomeTabs;
+
