@@ -1,115 +1,3 @@
-// // /hooks/device/useDevice.ts
-// "use client";
-
-// import useSWR from "swr";
-// import { useState } from "react";
-// import { toast } from "sonner";
-// import { deviceService } from "@/services/deviceServices";
-// import type { DeviceEdit } from "@/types/device";
-
-// /** GET all devices (flatten extras for UI tables) */
-// const fetchDevices = async () => {
-//   const res = await deviceService.getAllDevices();
-//   if (!res?.isSuccessful || !Array.isArray(res.data)) {
-//     throw new Error(res?.message || "Failed to fetch devices");
-//   }
-//   // flatten extras -> top-level
-//   return res.data.map((d: any) => ({ ...d, ...(d.extras || {}) }));
-// };
-
-// export function useAllDevices() {
-//   const { data, error, mutate } = useSWR("devices", fetchDevices);
-//   return {
-//     devices: data ?? [],
-//     loading: !data && !error,
-//     error,
-//     mutate,
-//   };
-// }
-
-// export function useCreateDevice() {
-//   const [loading, setLoading] = useState(false);
-//   const createDevice = async (payload: any) => {
-//     setLoading(true);
-//     try {
-//       const res = await deviceService.createDevice(payload);
-//       toast.success(res?.message || "Device created");
-//       return true;
-//     } catch (err: any) {
-//       toast.error(err.message || "Create failed");
-//       return false;
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-//   return { createDevice, loading };
-// }
-
-// export function useUpdateDevice() {
-//   const [loading, setLoading] = useState(false);
-//   const updateDevice = async (id: number, payload: any) => {
-//     setLoading(true);
-//     try {
-//       const res = await deviceService.updateDevice(id, payload);
-//       toast.success(res?.message || "Device updated");
-//       return true;
-//     } catch (err: any) {
-//       toast.error(err.message || "Update failed");
-//       return false;
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-//   return { updateDevice, loading };
-// }
-
-// export function useDeleteDevice() {
-//   const [loading, setLoading] = useState(false);
-//   const deleteDevice = async (id: number) => {
-//     setLoading(true);
-//     try {
-//       const res = await deviceService.deleteDevice(id);
-//       toast.success(res?.message || "Device deleted");
-//       return true;
-//     } catch (err: any) {
-//       toast.error(err.message || "Delete failed");
-//       return false;
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-//   return { deleteDevice, loading };
-// }
-
-// export function useGetDevice() {
-//   const [device, setDevice] = useState<DeviceEdit | null>(null);
-//   const [loading, setLoading] = useState(false);
-
-//   const getDevice = async (id: number) => {
-//     setLoading(true);
-//     try {
-//       const res = await deviceService.getDevice(id);
-//       if (res?.isSuccessful) setDevice(res.data);
-//       return res?.data;
-//     } catch (err: any) {
-//       toast.error(err.message || "Fetch failed");
-//       return null;
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   return { device, getDevice, loading };
-// }
-
-// export default {
-//   useAllDevices,
-//   useCreateDevice,
-//   useUpdateDevice,
-//   useDeleteDevice,
-//   useGetDevice,
-// };
-
 // hooks/device/useDevice.ts
 "use client";
 
@@ -118,13 +6,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { deviceService } from "@/services/deviceServices";
 import type { DeviceEdit, DeviceReg } from "@/types/device";
-
-/**
- * NOTE:
- *  - No client-side filtering by unit/role.
- *  - We trust the backend to scope results based on the authenticated user.
- *  - We only flatten extras for the table/UI.
- */
 
 const fetchDevices = async () => {
   const res = await deviceService.getAllDevices();
@@ -199,4 +80,71 @@ export function useDeleteDevice() {
     }
   };
   return { loading, deleteDevice };
+}
+
+// ✅ Bulk Delete (single toast, reuses single delete endpoint)
+export function useBulkDeleteDevices() {
+  const [loading, setLoading] = useState(false);
+
+  const bulkDelete = async (ids: (number | string)[]) => {
+    if (!ids?.length) return;
+    setLoading(true);
+    try {
+      const results = await Promise.allSettled(
+        ids.map((id) => deviceService.deleteDevice(Number(id)))
+      );
+
+      const success = results.filter((r) => r.status === "fulfilled").length;
+      const failed = results.length - success;
+
+      if (failed === 0) toast.success(`Deleted ${success} item(s).`);
+      else if (success === 0)
+        toast.error(`Failed to delete ${failed} item(s).`);
+      else toast.warning(`Deleted ${success}, failed ${failed}.`);
+      return { success, failed };
+    } catch (err: any) {
+      toast.error(err?.message || "Bulk delete failed.");
+      return { success: 0, failed: ids.length };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { loading, bulkDelete };
+}
+
+// ✅ Bulk Update (single toast, reuses single update endpoint)
+export function useBulkUpdateDevices() {
+  const [loading, setLoading] = useState(false);
+
+  const bulkUpdate = async (
+    ids: (number | string)[],
+    patch: Partial<DeviceEdit>
+  ) => {
+    if (!ids?.length) return;
+    if (!patch || Object.keys(patch).length === 0) return;
+
+    setLoading(true);
+    try {
+      const results = await Promise.allSettled(
+        ids.map((id) => deviceService.updateDevice(Number(id), patch))
+      );
+
+      const success = results.filter((r) => r.status === "fulfilled").length;
+      const failed = results.length - success;
+
+      if (failed === 0) toast.success(`Updated ${success} item(s).`);
+      else if (success === 0)
+        toast.error(`Failed to update ${failed} item(s).`);
+      else toast.warning(`Updated ${success}, failed ${failed}.`);
+      return { success, failed };
+    } catch (err: any) {
+      toast.error(err?.message || "Bulk update failed.");
+      return { success: 0, failed: ids.length };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { loading, bulkUpdate };
 }

@@ -88,6 +88,7 @@ export default function UserAction() {
     { key: "pin", label: "Pin", type: "text" },
     { key: "name", label: "Name", type: "text" },
     { key: "email", label: "Email", type: "email" },
+    { key: "unit", label: "Unit", type: "text" },
     {
       key: "userRole",
       label: "Role",

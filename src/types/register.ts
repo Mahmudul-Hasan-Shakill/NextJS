@@ -29,8 +29,24 @@ export type Register = {
   pin: string;
   name: string;
   email: string;
+  unit: string;
   userRole: string;
   isActive: boolean;
   isLocked: boolean;
   isReset: boolean;
 };
+
+export interface UserData {
+  pin: string;
+  name: string;
+  email: string;
+  unit: string;
+  division: string;
+  department: string;
+  makeBy: string;
+  userRole: string;
+  isActive?: boolean;
+  isLocked?: boolean;
+  isReset?: boolean;
+  isLogin?: boolean;
+}

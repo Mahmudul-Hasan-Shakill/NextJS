@@ -55,6 +55,7 @@ type DataTableProps<T> = {
   onEdit?: (row: T) => void;
   onDelete?: (row: T) => void;
   onBulkDelete?: (ids: (string | number)[]) => void;
+  onBulkEdit?: (ids: (string | number)[]) => void;
   showView?: boolean;
   showApprove?: boolean;
   showReset?: boolean;
@@ -72,6 +73,7 @@ export function DataTable<T extends { id: number | string }>({
   onEdit,
   onDelete,
   onBulkDelete,
+  onBulkEdit,
   showView = true,
   showApprove = false,
   showReset = false,
@@ -245,6 +247,7 @@ export function DataTable<T extends { id: number | string }>({
         <BulkActions
           selectedRowIds={selectedRowIds}
           onBulkDelete={onBulkDelete}
+          onBulkEdit={onBulkEdit}
         />
 
         <ColumnToggleMenu

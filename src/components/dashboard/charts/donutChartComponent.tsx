@@ -9,18 +9,16 @@ import {
   ResponsiveContainer,
   Sector,
 } from "recharts";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 function getColorFromString(str: string): string {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     hash = str.charCodeAt(i) + ((hash << 5) - hash);
   }
-
   const hue = Math.abs(hash) % 250;
   const saturation = 40 + (Math.abs(hash) % 30);
   const lightness = 50 + (Math.abs(hash) % 20);
-
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
 
@@ -29,7 +27,6 @@ const CustomTooltip = ({ active, payload }: any) => {
     const { name, value, payload: fullPayload } = payload[0];
     const total = fullPayload?.total;
     const percentage = total ? ((value / total) * 100).toFixed(1) : null;
-
     return (
       <div className="bg-white dark:bg-zinc-900 border border-border rounded-md p-2 text-xs text-black dark:text-white shadow">
         <p className="font-semibold">{`${name} ${value}`}</p>
@@ -37,15 +34,12 @@ const CustomTooltip = ({ active, payload }: any) => {
       </div>
     );
   }
-
   return null;
 };
 
-// Custom zoom effect for hovered slice
 const renderActiveShape = (props: any) => {
   const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } =
     props;
-
   return (
     <Sector
       cx={cx}
@@ -59,13 +53,13 @@ const renderActiveShape = (props: any) => {
   );
 };
 
+// DonutChartComponent.tsx
 export const DonutChartComponent = ({
   data,
 }: {
   data: { name: string; value: number }[];
 }) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-
   const total = data.reduce((sum, item) => sum + item.value, 0);
   const chartData = data.map((item) => ({ ...item, total }));
 
@@ -94,6 +88,19 @@ export const DonutChartComponent = ({
             />
           ))}
         </Pie>
+
+        {/* ⬇️ center total */}
+        <text
+          x="50%"
+          y="50%"
+          textAnchor="middle"
+          dominantBaseline="middle"
+          style={{ fontSize: 18, fontWeight: 600 }}
+          className="fill-black dark:fill-white"
+        >
+          {total}
+        </text>
+
         <Tooltip content={<CustomTooltip />} />
         <Legend wrapperStyle={{ fontSize: "0.75rem" }} />
       </PieChart>

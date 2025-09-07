@@ -54,8 +54,12 @@ export function PhysicalHostRegister() {
     }
 
     // Handle date fields
-    if (id === "warrantyExpiry" && value) {
-      setFormData((prev) => ({ ...prev, [id]: new Date(value) }));
+    // if (id === "warrantyExpiry" && value) {
+    //   setFormData((prev) => ({ ...prev, [id]: new Date(value) }));
+    //   return;
+    // }
+    if (id === "warrantyExpiry") {
+      setFormData((prev) => ({ ...prev, [id]: value || undefined }));
       return;
     }
 

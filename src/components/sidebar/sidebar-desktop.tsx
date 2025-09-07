@@ -187,7 +187,7 @@ export function SidebarDesktop({ sidebarItems }: SidebarDesktopProps) {
               priority
             />
             <span
-              className="self-center text-[8px] font-semibold sm:text-[8px] lg:text-[10px] text-sky-900 dark:text-yellow-400 truncate"
+              className="self-center text-[8px] font-semibold sm:text-[8px] lg:text-[10px] text-black dark:text-yellow-400 truncate"
               title={userName || "Loading..."}
             >
               Hi, <span className="truncate">{userName || "Loading..."}</span>
@@ -246,7 +246,7 @@ export function SidebarDesktop({ sidebarItems }: SidebarDesktopProps) {
                 </div>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="sm:mb-0 sm:ml-[20px] lg:mb-[-40px] lg:ml-[250px] w-44 p-4 rounded-[10px] bg-gray-100 dark:bg-gray-950">
+            <PopoverContent className="sm:mb-0 sm:ml-[20px] lg:mb-[-40px] lg:ml-[250px] w-44 p-4 rounded-[10px] bg-white dark:bg-gray-950 opacity-90">
               <div className="space-y-1">
                 <RoleBasedAccess allowedRoles={allowedRolesForSettings}>
                   <Link href="/user-profile">

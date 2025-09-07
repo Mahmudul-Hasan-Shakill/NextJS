@@ -19,7 +19,7 @@ export interface PhysicalHostReg {
   hypervisorType?: string;
   hypervisorVersion?: string;
   status?: string;
-  warrantyExpiry?: Date;
+  warrantyExpiry?: string;
   assignedToTeam?: string;
   isActive?: boolean;
   makeBy: string;

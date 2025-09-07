@@ -40,12 +40,33 @@ export const amcService = {
     return handleResponse<AmcData>(res);
   },
 
+  // async getAllAmc(
+  //   queryParams?: AmcQueryParams
+  // ): Promise<BackendResponse<AmcData[]>> {
+  //   const queryString = queryParams
+  //     ? "?" + new URLSearchParams(queryParams as any).toString()
+  //     : "";
+  //   const res = await fetch(`${baseUrl}amc${queryString}`, {
+  //     method: "GET",
+  //     headers: getAuthHeaders(),
+  //     credentials: "include",
+  //   });
+  //   return handleResponse<AmcData[]>(res);
+  // },
+
   async getAllAmc(
     queryParams?: AmcQueryParams
   ): Promise<BackendResponse<AmcData[]>> {
-    const queryString = queryParams
-      ? "?" + new URLSearchParams(queryParams as any).toString()
-      : "";
+    // Strip pagination keys if they exist in your AmcQueryParams type
+    const { page, limit, ...filters } = (queryParams || {}) as Record<
+      string,
+      any
+    >;
+    const queryString =
+      Object.keys(filters).length > 0
+        ? "?" + new URLSearchParams(filters as any).toString()
+        : "";
+
     const res = await fetch(`${baseUrl}amc${queryString}`, {
       method: "GET",
       headers: getAuthHeaders(),

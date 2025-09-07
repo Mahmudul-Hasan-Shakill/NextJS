@@ -55,7 +55,7 @@ export interface AmcData {
   makeBy: string;
   makeDate: string;
   editBy?: string;
-  editDate: string;
+  editDate?: string;
   isActive: boolean;
   documents: DocumentData[];
   documentIdsToRemove?: number[];
